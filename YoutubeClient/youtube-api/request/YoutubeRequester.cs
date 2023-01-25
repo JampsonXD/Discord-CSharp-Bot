@@ -1,14 +1,10 @@
 ﻿using System.Net;
-using System.Net.Http.Headers;
 using System.Text;
-using Discord_CSharp_Bot.modules.youtube_api.exceptions;
-using Discord_CSharp_Bot.modules.youtube_api.models;
-using Discord_CSharp_Bot.modules.youtube_api.request.interfaces;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+using YoutubeClient.youtube_api.exceptions;
+using YoutubeClient.youtube_api.request.interfaces;
 
-namespace Discord_CSharp_Bot.modules.youtube_api.request;
+namespace YoutubeClient.youtube_api.request;
 
 public class YoutubeRequester : IRequester
 {

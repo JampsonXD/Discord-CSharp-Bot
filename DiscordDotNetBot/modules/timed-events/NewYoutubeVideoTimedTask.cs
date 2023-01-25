@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord_CSharp_Bot.modules.discord_embeds;
 using Discord_CSharp_Bot.modules.timed_events.interfaces;
-using Discord_CSharp_Bot.modules.youtube_api.models;
-using Discord_CSharp_Bot.modules.youtube_api.request.interfaces;
-using Discord_CSharp_Bot.modules.youtube_api.request.request_parameters;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using YoutubeClient.youtube_api.models;
+using YoutubeClient.youtube_api.request.interfaces;
+using YoutubeClient.youtube_api.request.request_parameters;
 
 namespace Discord_CSharp_Bot.modules.timed_events;
 

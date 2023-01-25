@@ -1,6 +1,6 @@
-﻿using Discord_CSharp_Bot.modules.youtube_api.request.interfaces;
+﻿using YoutubeClient.youtube_api.request.interfaces;
 
-namespace Discord_CSharp_Bot.modules.youtube_api.request;
+namespace YoutubeClient.youtube_api.request;
 
 /* Represents a Get Request that would be sent across a network */
 public class GetRequest : IRequest

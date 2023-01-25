@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Discord_CSharp_Bot.modules.youtube_api.models;
+namespace YoutubeClient.youtube_api.models;
 
 // Contains information about the responses page, such as the total results found
 public class YoutubeResponsePageInfo
@@ -32,11 +32,11 @@ public class YoutubeResponseDataWrapper<T>
     
     // Token that can be used as a value of pageToken parameter to get the next page in a result set
     [JsonProperty("nextPageToken")]
-    public string NextPageToken { get; set; }
+    public string? NextPageToken { get; set; }
     
     // Token that can be used as a value of pageToken parameter to get the previous page in a result set
     [JsonProperty("prevPageToken")]
-    public string PreviousPageToken { get; set; }
+    public string? PreviousPageToken { get; set; }
     
     // Encapsulates paging info for a result set
     [JsonProperty("pageInfo")]

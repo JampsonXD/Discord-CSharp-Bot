@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord CSharp Bot", "Discord CSharp Bot\Discord CSharp Bot.csproj", "{1953F974-9953-4EF7-B597-C688A3040544}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord CSharp Bot", "DiscordDotNetBot\Discord CSharp Bot.csproj", "{9BA00D17-961C-44F6-AC75-DB0FAA621553}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeClient", "YoutubeClient\YoutubeClient.csproj", "{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +10,13 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1953F974-9953-4EF7-B597-C688A3040544}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1953F974-9953-4EF7-B597-C688A3040544}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1953F974-9953-4EF7-B597-C688A3040544}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1953F974-9953-4EF7-B597-C688A3040544}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BA00D17-961C-44F6-AC75-DB0FAA621553}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BA00D17-961C-44F6-AC75-DB0FAA621553}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BA00D17-961C-44F6-AC75-DB0FAA621553}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BA00D17-961C-44F6-AC75-DB0FAA621553}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

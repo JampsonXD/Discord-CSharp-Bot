@@ -1,13 +1,8 @@
-﻿using Discord_CSharp_Bot.modules.youtube_api.endpoint;
-using Discord_CSharp_Bot.modules.youtube_api.endpoint.interfaces;
-using Discord_CSharp_Bot.modules.youtube_api.models;
-using Discord_CSharp_Bot.modules.youtube_api.request;
-using Discord_CSharp_Bot.modules.youtube_api.request.interfaces;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using YoutubeClient.youtube_api.endpoint.interfaces;
+using YoutubeClient.youtube_api.request.interfaces;
 
-namespace Discord_CSharp_Bot.modules.youtube_api;
+namespace YoutubeClient.youtube_api;
 
 public class YoutubeRequestClient : IYoutubeClient
 {
@@ -16,8 +11,9 @@ public class YoutubeRequestClient : IYoutubeClient
 
     public IYoutubeChannelEndpoint YoutubeChannelEndpoint { get; }
     public IYoutubePlaylistItemsEndpoint YoutubePlaylistItemsEndpoint { get; }
+    public IYoutubeVideoEndpoint YoutubeVideoEndpoint { get; }
 
-    public YoutubeRequestClient(IYoutubeChannelEndpoint youtubeChannelEndpoint, IYoutubePlaylistItemsEndpoint youtubePlaylistItemsEndpoint, IConfiguration configuration)
+    public YoutubeRequestClient(IYoutubeChannelEndpoint youtubeChannelEndpoint, IYoutubePlaylistItemsEndpoint youtubePlaylistItemsEndpoint,IYoutubeVideoEndpoint youtubeVideoEndpoint, IConfiguration configuration)
     {
         _apiKey = configuration["YoutubeApiKey"] ?? throw new InvalidOperationException("Config does not have YoutubeApiKey assigned!");
         _apiToken = configuration["YoutubeApiToken"] ??
@@ -25,6 +21,7 @@ public class YoutubeRequestClient : IYoutubeClient
 
         YoutubeChannelEndpoint = youtubeChannelEndpoint;
         YoutubePlaylistItemsEndpoint = youtubePlaylistItemsEndpoint;
+        YoutubeVideoEndpoint = youtubeVideoEndpoint;
     }
 
     public string GetApiKey()

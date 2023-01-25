@@ -1,4 +1,4 @@
-﻿namespace Discord_CSharp_Bot.modules.youtube_api.request.interfaces;
+﻿namespace YoutubeClient.youtube_api.request.interfaces;
 
 public interface IRequest
 {

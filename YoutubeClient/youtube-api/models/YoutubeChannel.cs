@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Discord_CSharp_Bot.modules.youtube_api.models;
+namespace YoutubeClient.youtube_api.models;
 
 // Represents a youtube channel and details that are given back from the api call
 public class YoutubeChannel

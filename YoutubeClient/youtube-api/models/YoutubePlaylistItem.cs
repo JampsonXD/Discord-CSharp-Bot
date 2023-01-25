@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Discord_CSharp_Bot.modules.youtube_api.models;
+namespace YoutubeClient.youtube_api.models;
 
 public class YoutubePlaylistItem
 {
@@ -99,19 +99,4 @@ public class YoutubePlaylistItemSnippet
     
     [JsonProperty("resourceId")]
     public YoutubePlaylistItemSnippetResourceId ResourceId { get; set; }
-}
-
-public class YoutubeThumbnailData
-{
-    // The thumbnail's Url
-    [JsonProperty("url")]
-    public string Url { get; set; }
-    
-    // Width of the thumbnail
-    [JsonProperty("width")]
-    public uint Width { get; set; }
-    
-    // Height of the thumbnail
-    [JsonProperty("height")]
-    public uint Height { get; set; }
 }

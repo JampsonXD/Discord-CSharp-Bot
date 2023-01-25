@@ -1,4 +1,4 @@
-﻿namespace Discord_CSharp_Bot.modules.youtube_api.exceptions;
+﻿namespace YoutubeClient.youtube_api.exceptions;
 
 [Serializable]
 public class YoutubeInvalidRequestException : Exception

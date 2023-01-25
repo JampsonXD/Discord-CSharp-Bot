@@ -5,19 +5,19 @@ namespace Discord_CSharp_Bot.modules.timed_events;
 public class TimedTask : ITimedTask
 {
 
-    private readonly int _interval;
+    private readonly TimeSpan _interval;
     private DateTime _taskFinishTime;
     public Action? Action { get; set; }
 
-    public TimedTask(int interval)
+    public TimedTask(TimeSpan interval, Action? action = null)
     {
         _interval = interval;
-        Action = null;
+        Action = action;
     }
     
     public async Task<bool> CanExecuteTask()
     {
-        return DateTime.Now > _taskFinishTime;
+        return DateTime.UtcNow > _taskFinishTime;
     }
 
     public async Task ExecuteTask()
@@ -27,6 +27,6 @@ public class TimedTask : ITimedTask
 
     public async Task InitializeTask(IServiceProvider serviceProvider)
     {
-        _taskFinishTime = DateTime.Now.AddSeconds(_interval);
+        _taskFinishTime = DateTime.UtcNow + _interval;
     }
 }

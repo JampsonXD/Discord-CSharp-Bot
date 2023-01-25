@@ -3,16 +3,16 @@ using Discord;
 using Discord_CSharp_Bot.modules.api;
 using Discord_CSharp_Bot.modules.command_handling;
 using Discord_CSharp_Bot.modules.timed_events;
-using Discord_CSharp_Bot.modules.youtube_api;
-using Discord_CSharp_Bot.modules.youtube_api.endpoint;
-using Discord_CSharp_Bot.modules.youtube_api.endpoint.interfaces;
-using Discord_CSharp_Bot.modules.youtube_api.request;
-using Discord_CSharp_Bot.modules.youtube_api.request.interfaces;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using YoutubeClient.youtube_api;
+using YoutubeClient.youtube_api.endpoint;
+using YoutubeClient.youtube_api.endpoint.interfaces;
+using YoutubeClient.youtube_api.request;
+using YoutubeClient.youtube_api.request.interfaces;
 
 namespace Discord_CSharp_Bot
 {
@@ -45,6 +45,7 @@ namespace Discord_CSharp_Bot
             // Check for mogul mail
             taskHandler.AddTask(new NewYoutubeVideoTimedTask(TimeSpan.FromMinutes(5),"UUjK0F1DopxQ5U0sCwOlXwOg", 183663101848059906));
             taskHandler.Run();
+            
             await Task.Delay(-1);
         }
 
@@ -79,6 +80,7 @@ namespace Discord_CSharp_Bot
                 .AddScoped<Random>()
                 .AddScoped<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions()))
                 .AddScoped<IYoutubeChannelEndpoint, YoutubeChannelEndpoint>()
+                .AddScoped<IYoutubeVideoEndpoint, YoutubeVideoEndpoint>()
                 .AddSingleton<IRequester, YoutubeRequester>()
                 .AddScoped<IYoutubePlaylistItemsEndpoint, YoutubePlaylistItemsEndpoint>()
                 .AddSingleton<IYoutubeClient, YoutubeRequestClient>()

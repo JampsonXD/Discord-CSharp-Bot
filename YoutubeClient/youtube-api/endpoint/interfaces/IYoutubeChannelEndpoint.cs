@@ -1,7 +1,7 @@
-﻿using Discord_CSharp_Bot.modules.youtube_api.models;
-using Discord_CSharp_Bot.modules.youtube_api.request.request_parameters;
+﻿using YoutubeClient.youtube_api.models;
+using YoutubeClient.youtube_api.request.request_parameters;
 
-namespace Discord_CSharp_Bot.modules.youtube_api.endpoint.interfaces;
+namespace YoutubeClient.youtube_api.endpoint.interfaces;
 
 
 

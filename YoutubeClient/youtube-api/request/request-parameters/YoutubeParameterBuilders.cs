@@ -1,4 +1,4 @@
-﻿namespace Discord_CSharp_Bot.modules.youtube_api.request.request_parameters;
+﻿namespace YoutubeClient.youtube_api.request.request_parameters;
 
 public class YoutubeParameterBuilder
 {
@@ -31,6 +31,8 @@ public class YoutubeParameterBuilder
             {
                 list.Add(value);
             }
+
+            return;
         }
         
         _builderObject.Parameters.Add(key, new List<string>() { value });
@@ -42,6 +44,7 @@ public class YoutubeParameterBuilder
         if(_builderObject.Parameters.TryGetValue(key, out var list))
         {
             list.Insert(0, value);
+            return;
         }
         
         _builderObject.Parameters.Add(key, new List<string>() { value });
@@ -104,6 +107,60 @@ public class YoutubePlaylistItemParameterBuilder : YoutubeParameterBuilder
     public YoutubePlaylistItemParameterBuilder WithMaxResults(int maxResults)
     {
         FindOrReplaceValue("maxResults", maxResults.ToString());
+        return this;
+    }
+
+    public YoutubePlaylistItemParameterBuilder WithPageToken(string? pageToken)
+    {
+        if (pageToken != null)
+        {
+            FindOrReplaceValue("pageToken", pageToken);
+        }
+        return this;
+    }
+}
+
+public class YoutubeVideoParameterBuilder : YoutubeParameterBuilder
+{
+    public YoutubeVideoParameterBuilder AddVideoId(string id)
+    {
+        FindOrAddValue("id", id);
+        return this;
+    }
+    
+    public YoutubeVideoParameterBuilder AddVideoIds(List<string> ids)
+    {
+        foreach (var id in ids)
+        {
+            FindOrAddValue("id", id);
+        }
+        return this;
+    }
+
+    public YoutubeVideoParameterBuilder WithContentDetails()
+    {
+        FindOrAddValue("part", "contentDetails");
+        return this;
+    }
+    
+    public YoutubeVideoParameterBuilder WithSnippet()
+    {
+        FindOrAddValue("part", "snippet");
+        return this;
+    }
+
+    public YoutubeVideoParameterBuilder WithMaxResults(int maxResults)
+    {
+        FindOrReplaceValue("maxResults", maxResults.ToString());
+        return this;
+    }
+    
+    public YoutubeVideoParameterBuilder WithPageToken(string? pageToken)
+    {
+        if (pageToken != null)
+        {
+            FindOrReplaceValue("pageToken", pageToken);
+        }
         return this;
     }
 }

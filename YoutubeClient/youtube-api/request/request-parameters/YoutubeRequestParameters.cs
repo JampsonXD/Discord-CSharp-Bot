@@ -1,7 +1,7 @@
 ﻿using System.Text;
-using Discord_CSharp_Bot.modules.youtube_api.request.request_parameters.interfaces;
+using YoutubeClient.youtube_api.request.request_parameters.interfaces;
 
-namespace Discord_CSharp_Bot.modules.youtube_api.request.request_parameters;
+namespace YoutubeClient.youtube_api.request.request_parameters;
 
 public class YoutubeRequestParameters : IRequestParameter
 {

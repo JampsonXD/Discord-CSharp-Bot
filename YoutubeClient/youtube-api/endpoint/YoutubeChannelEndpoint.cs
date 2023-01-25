@@ -1,12 +1,12 @@
-﻿using System.Net;
-using Discord_CSharp_Bot.modules.youtube_api.endpoint.interfaces;
-using Discord_CSharp_Bot.modules.youtube_api.models;
-using Discord_CSharp_Bot.modules.youtube_api.request;
-using Discord_CSharp_Bot.modules.youtube_api.request.interfaces;
-using Discord_CSharp_Bot.modules.youtube_api.request.request_parameters;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-namespace Discord_CSharp_Bot.modules.youtube_api.endpoint;
+using YoutubeClient.youtube_api.endpoint.interfaces;
+using YoutubeClient.youtube_api.models;
+using YoutubeClient.youtube_api.request;
+using YoutubeClient.youtube_api.request.interfaces;
+using YoutubeClient.youtube_api.request.request_parameters;
+
+namespace YoutubeClient.youtube_api.endpoint;
 
 public class YoutubeChannelEndpoint : IYoutubeChannelEndpoint
 {

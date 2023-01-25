@@ -1,15 +1,15 @@
 ﻿using System.Net;
-using Discord_CSharp_Bot.modules.youtube_api.endpoint.interfaces;
-using Discord_CSharp_Bot.modules.youtube_api.exceptions;
-using Discord_CSharp_Bot.modules.youtube_api.models;
-using Discord_CSharp_Bot.modules.youtube_api.request;
-using Discord_CSharp_Bot.modules.youtube_api.request.interfaces;
-using Discord_CSharp_Bot.modules.youtube_api.request.request_parameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using YoutubeClient.youtube_api.endpoint.interfaces;
+using YoutubeClient.youtube_api.exceptions;
+using YoutubeClient.youtube_api.models;
+using YoutubeClient.youtube_api.request;
+using YoutubeClient.youtube_api.request.interfaces;
+using YoutubeClient.youtube_api.request.request_parameters;
 
-namespace Discord_CSharp_Bot.modules.youtube_api.endpoint;
+namespace YoutubeClient.youtube_api.endpoint;
 
 public class YoutubePlaylistItemsEndpoint: IYoutubePlaylistItemsEndpoint
 {
