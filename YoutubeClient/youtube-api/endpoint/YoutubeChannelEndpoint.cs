@@ -1,22 +1,16 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Caching.Memory;
 using YoutubeClient.youtube_api.endpoint.interfaces;
 using YoutubeClient.youtube_api.models;
-using YoutubeClient.youtube_api.request;
 using YoutubeClient.youtube_api.request.interfaces;
 using YoutubeClient.youtube_api.request.request_parameters;
 
 namespace YoutubeClient.youtube_api.endpoint;
 
-public class YoutubeChannelEndpoint : IYoutubeChannelEndpoint
+public class YoutubeChannelEndpoint : BaseYoutubeEndpoint<YoutubeChannel>, IYoutubeChannelEndpoint
 {
-    private readonly string _youtubeHost = "youtube.googleapis.com/youtube/v3/";
-    private readonly string _relativeUrl = "channels";
-    private readonly IRequester _requester;
-
-    public YoutubeChannelEndpoint(IRequester requester, IConfiguration configuration)
+    public YoutubeChannelEndpoint(IRequester requester, IMemoryCache memoryCache): base(requester, memoryCache)
     {
-        _requester = requester;
+        RelativeUrl = "channels";
     }
     
     public async Task<YoutubeChannel> GetYoutubeChannelByIdAsync(string channelId)
@@ -37,17 +31,7 @@ public class YoutubeChannelEndpoint : IYoutubeChannelEndpoint
 
     public async Task<YoutubeChannel> GetYoutubeChannelWithParametersAsync(YoutubeRequestParameters parameters)
     {
-        // Construct parameters
-        var paramList = parameters.ConstructParameters();
-
-        var builder = new GetRequestBuilder().WithHost(_youtubeHost).WithRelativeUrl(_relativeUrl)
-            .WithHttps().AddUrlParameters(paramList);
-
-        var response =
-            await _requester.CreateRequestAsync(
-                builder.Build());
-
-        var channel = JsonConvert.DeserializeObject<YoutubeResponseDataWrapper<YoutubeChannel>>(await response.Content.ReadAsStringAsync()).Items.First();
-        return channel;
+        var response = await GetYoutubeResponseData(parameters, null);
+        return response.Items.First();
     }
 }
