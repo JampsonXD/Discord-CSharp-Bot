@@ -8,11 +8,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using YoutubeClient.youtube_api;
-using YoutubeClient.youtube_api.endpoint;
-using YoutubeClient.youtube_api.endpoint.interfaces;
-using YoutubeClient.youtube_api.request;
-using YoutubeClient.youtube_api.request.interfaces;
+using YoutubeClient.youtube_api.services;
 
 namespace Discord_CSharp_Bot
 {
@@ -43,7 +39,8 @@ namespace Discord_CSharp_Bot
 
             var taskHandler = serviceProvider.GetRequiredService<TimedTaskHandler>();
             // Check for mogul mail
-            taskHandler.AddTask(new NewYoutubeVideoTimedTask(TimeSpan.FromMinutes(5),"UUjK0F1DopxQ5U0sCwOlXwOg", 183663101848059906));
+            taskHandler.AddTask(new NewYoutubeVideoTimedTask(
+                TimeSpan.FromMinutes(10),"UUjK0F1DopxQ5U0sCwOlXwOg", 183663101848059906, serviceProvider.GetRequiredService<YoutubeClientService>(), client));
             taskHandler.Run();
             
             await Task.Delay(-1);
@@ -74,16 +71,16 @@ namespace Discord_CSharp_Bot
                     IgnoreExtraArgs = true,
                     LogLevel = LogSeverity.Verbose
                 }))
-                .AddSingleton<CommandHandleService>()
                 .AddSingleton<HttpClient>()
+                .AddSingleton<YoutubeClientService>(provider => new YoutubeClientService(new ClientServiceInitializer()
+                {
+                    ApiKey = provider.GetRequiredService<IConfiguration>()["YoutubeApiKey"] ?? throw new InvalidOperationException(),
+                    HttpClient = provider.GetRequiredService<HttpClient>()
+                }))
+                .AddSingleton<CommandHandleService>()
                 .AddSingleton<SaplingApiClient>()
                 .AddScoped<Random>()
                 .AddScoped<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions()))
-                .AddScoped<IYoutubeChannelEndpoint, YoutubeChannelEndpoint>()
-                .AddScoped<IYoutubeVideoEndpoint, YoutubeVideoEndpoint>()
-                .AddSingleton<IRequester, YoutubeRequester>()
-                .AddScoped<IYoutubePlaylistItemsEndpoint, YoutubePlaylistItemsEndpoint>()
-                .AddSingleton<IYoutubeClient, YoutubeRequestClient>()
                 .AddSingleton<TimedTaskHandler>()
                 .BuildServiceProvider();
         }

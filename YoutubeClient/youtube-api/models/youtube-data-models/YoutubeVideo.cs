@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace YoutubeClient.youtube_api.models;
+namespace YoutubeClient.youtube_api.models.youtube_data_models;
 
 public class YoutubeVideo
 {

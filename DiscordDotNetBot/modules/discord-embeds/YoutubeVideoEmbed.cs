@@ -1,5 +1,6 @@
 ﻿using Discord;
 using YoutubeClient.youtube_api.models;
+using YoutubeClient.youtube_api.models.youtube_data_models;
 
 namespace Discord_CSharp_Bot.modules.discord_embeds;
 
