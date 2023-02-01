@@ -1,8 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord CSharp Bot", "DiscordDotNetBot\Discord CSharp Bot.csproj", "{9BA00D17-961C-44F6-AC75-DB0FAA621553}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeClient", "YoutubeClient\YoutubeClient.csproj", "{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientService", "ClientService\ClientService.csproj", "{8A215518-B2AF-4EB2-B2B5-825F4313C31A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyClient", "SpotifyClient\SpotifyClient.csproj", "{2FBAB273-6B63-41E5-934E-6ADB8B8A3210}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBot", "DiscordBot\DiscordBot.csproj", "{E06891CD-CF5E-44DB-BF80-35B5CA7CFB50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,13 +14,21 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9BA00D17-961C-44F6-AC75-DB0FAA621553}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9BA00D17-961C-44F6-AC75-DB0FAA621553}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9BA00D17-961C-44F6-AC75-DB0FAA621553}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9BA00D17-961C-44F6-AC75-DB0FAA621553}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFDBF8CF-19B7-4C8A-A8DC-E56F7B8A3D27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A215518-B2AF-4EB2-B2B5-825F4313C31A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A215518-B2AF-4EB2-B2B5-825F4313C31A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A215518-B2AF-4EB2-B2B5-825F4313C31A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A215518-B2AF-4EB2-B2B5-825F4313C31A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FBAB273-6B63-41E5-934E-6ADB8B8A3210}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FBAB273-6B63-41E5-934E-6ADB8B8A3210}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FBAB273-6B63-41E5-934E-6ADB8B8A3210}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FBAB273-6B63-41E5-934E-6ADB8B8A3210}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E06891CD-CF5E-44DB-BF80-35B5CA7CFB50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E06891CD-CF5E-44DB-BF80-35B5CA7CFB50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E06891CD-CF5E-44DB-BF80-35B5CA7CFB50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E06891CD-CF5E-44DB-BF80-35B5CA7CFB50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
