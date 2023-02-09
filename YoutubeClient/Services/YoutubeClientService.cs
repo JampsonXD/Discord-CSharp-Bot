@@ -16,6 +16,7 @@ public class YoutubeClientService: IClientService
     public ChannelResource ChannelResource { get; }
     
     public VideoResource VideoResource { get; }
+    public SearchResource SearchResource { get; }
 
     public YoutubeClientService(ClientServiceInitializer serviceInitializer)
     {
@@ -26,6 +27,7 @@ public class YoutubeClientService: IClientService
         PlaylistItemResource = new PlaylistItemResource(this);
         ChannelResource = new ChannelResource(this);
         VideoResource = new VideoResource(this);
+        SearchResource = new SearchResource(this);
     }
     
     public T HandleHttpResponseMessage<T>(HttpResponseMessage response)
