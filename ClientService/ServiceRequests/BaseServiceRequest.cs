@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using ClientService.ClientService;
 using ClientService.ServiceRequests.Interfaces;
+using Newtonsoft.Json;
 
 namespace ClientService.ServiceRequests;
 
@@ -47,6 +49,11 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
         InitializeUriParameters();
     }
 
+    protected virtual object? GetBody()
+    {
+        return null;
+    }
+
     protected virtual void InitializeUriParameters()
     {
         if (!string.IsNullOrWhiteSpace(ClientService.ApiKey))
@@ -73,6 +80,16 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
     HttpRequestMessage CreateRequestMessage()
     {
         HttpRequestMessage message = new HttpRequestMessage(HttpMethod, GenerateRequestUri());
+
+        object? body = GetBody();
+        if (body != null)
+        {
+            var json = JsonConvert.SerializeObject(body);
+            var content = new ByteArrayContent(System.Text.Encoding.UTF8.GetBytes(json));
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            message.Content = content;
+        }
+        
         return message;
     }
 
