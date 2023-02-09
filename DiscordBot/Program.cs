@@ -1,10 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
-
 using ClientService.ClientService;
 using ClientService.Core;
 using ClientService.Core.Authorization;
 using Discord;
 using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using DiscordBot.Modules.Sapling;
 using DiscordBot.Modules.TimedEvents;
@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpotifyClient.Services;
 using YoutubeClient.Services;
+using RunMode = Discord.Commands.RunMode;
 
 namespace DiscordBot
 {
@@ -31,21 +32,27 @@ namespace DiscordBot
 
             // Log our command services
             serviceProvider.GetRequiredService<CommandService>().Log += ApplicationLog;
+
+            // Initialize our command handler and interaction handler
+            await serviceProvider.GetRequiredService<CommandHandleService>().InitializeAsync();
+            await serviceProvider.GetRequiredService<InteractionHandleService>().InitializeAsync();
             
+            // As soon as our client is ready, register all interaction commands
+            client.Ready += async () =>
+            {
+                await serviceProvider.GetRequiredService<InteractionService>().RegisterCommandsGloballyAsync();
+            };
 
             // Login and start running our discord client
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
-            
-            // Initialize our command handler
-            await serviceProvider.GetRequiredService<CommandHandleService>().InitializeAsync();
 
             var taskHandler = serviceProvider.GetRequiredService<TimedTaskHandler>();
 
             // Check for mogul mail
             taskHandler.AddTask(new NewYoutubeVideoTimedTask(
                 TimeSpan.FromMinutes(10),"UUjK0F1DopxQ5U0sCwOlXwOg", 183663101848059906, serviceProvider.GetRequiredService<YoutubeClientService>(), client));
-            taskHandler.Run();
+            taskHandler.Start();
             
             await Task.Delay(-1);
         }
@@ -68,6 +75,11 @@ namespace DiscordBot
                     MessageCacheSize = 1000,
                     GatewayIntents = GatewayIntents.All
                 }))
+                .AddSingleton<InteractionService>(provider => new InteractionService(provider.GetRequiredService<DiscordSocketClient>(), new InteractionServiceConfig()
+                {
+                    DefaultRunMode = Discord.Interactions.RunMode.Async
+                }))
+                .AddSingleton<InteractionHandleService>()
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     CaseSensitiveCommands = false,

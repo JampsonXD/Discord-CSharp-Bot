@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Xml;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Modules.DiscordEmbeds;
@@ -27,6 +26,31 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
         _ludwigServiceRequest = _youtubeClientService.ChannelResource.List();
         _ludwigServiceRequest.Id = "UCjK0F1DopxQ5U0sCwOlXwOg";
         _ludwigServiceRequest.Parts.Add("contentDetails");
+    }
+
+    [Command("SearchYoutubeChannel")]
+    [RequireOwner]
+    [Summary("Searches for youtube channels that match the inputted query")]
+    public async Task SearchYoutubeChannelAsync(string query)
+    {
+        try
+        {
+            var request = _youtubeClientService.SearchResource.List();
+            request.SetSearchResultOrder(YoutubeSearchResultsOrder.Relevance);
+            request.MaxResults = 10;
+            request.Query = query;
+            request.SetSearchType(YoutubeSearchType.Channel);
+
+            var response = await request.ExecuteRequestAsync();
+            var foundChannels = response.Items.Select(item => item.Snippet.ChannelTitle)
+                .Aggregate(string.Empty, (total, next) => total + "," + next);
+            foundChannels = foundChannels.Remove(0, 1);
+            await Context.Channel.SendMessageAsync(foundChannels);
+        }
+        catch (YoutubeInvalidRequestException e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
     
     [Command("FindUploadPlaylistName")]
@@ -91,8 +115,8 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
         {
             return;
         }
-
-        // Find a task that is a YoutubeVideoTimedTask and has the same discord user id and playlist id
+        
+            // Find a task that is a YoutubeVideoTimedTask and has the same discord user id and playlist id
         if (timedTaskHandler.FindTask(currentTask =>
             {
                 var youtubeTask = currentTask as NewYoutubeVideoTimedTask;
@@ -139,26 +163,19 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
     [Summary("Find the total duration of all videos added up for a youtube playlist")]
     public async Task FindPlaylistDurationTotal(string playlistId)
     {
-        var stopwatch = Stopwatch.StartNew();
-        var request = _youtubeClientService.PlaylistItemResource.List();
-        request.Parts.Add("snippet");
-        request.PlaylistId = playlistId;
-
-        List<string> videoIds = new List<string>();
-
-        var playlistItems = await GetAllPlaylistItemsInternalAsync(request);
-        playlistItems.ForEach(item => 
-            item.Items.ForEach(playlistItem =>
-            {
-                Debug.Assert(playlistItem.Snippet != null, "playlistItem.Snippet != null");
-                videoIds.Add(playlistItem.Snippet.ResourceId.VideoId);
-            }));
-
-        TimeSpan duration = await GetVideoListTotalDurationAsync(videoIds);
-
-        Console.WriteLine($"Executed request for the requested data in {stopwatch.Elapsed.ToString()} time.");
-        await Context.Channel.SendMessageAsync($"Total time length is {duration.Days} days, {duration.Hours} hours," +
-                                               $" {duration.Minutes} minutes, and {duration.Seconds} seconds.");
+        try
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var duration = await YoutubeHelpers.YoutubeHelpers.FindPlaylistDurationTotal(playlistId, _youtubeClientService);
+            Console.WriteLine($"Executed request for the requested data in {stopwatch.Elapsed.ToString()} time.");
+            await Context.Channel.SendMessageAsync($"Total time length is {duration.Days} days, {duration.Hours} hours," +
+                                                   $" {duration.Minutes} minutes, and {duration.Seconds} seconds.");
+        }
+        catch(YoutubeInvalidRequestException e)
+        {
+            Console.WriteLine($"Exception occured while trying to retrieve request data. \n {e.Message}");
+            await Context.Channel.SendMessageAsync("Unable to handle request!");
+        }
     }
     
     [Command("FindPlaylistDurationLeftFromVideo")]
@@ -166,74 +183,21 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
     [Summary("Find the duration leftover if watching a playlist in order from a specific video")]
     public async Task FindPlaylistDurationLeftFromVideoAsync(string playlistId, string videoId)
     {
-        var stopwatch = Stopwatch.StartNew();
-        List<string> videoIds = new List<string>();
-        
-        var request = _youtubeClientService.PlaylistItemResource.List();
-        request.Parts.Add("snippet");
-        request.PlaylistId = playlistId;
-        request.MaxResults = 50;
-        
-        do
+        try
         {
-            var playlistItems = await request.ExecuteRequestAsync();
-            foreach (var item in playlistItems.Items)
-            {
-                if (item.Snippet.ResourceId.VideoId == videoId)
-                {
-                    request.PageToken = null;
-                    break;
-                }
-
-                videoIds.Add(item.Snippet.ResourceId.VideoId);
-                request.PageToken = playlistItems.NextPageToken;
-            }
-        } while (request.PageToken != null);
-
-        var duration = await GetVideoListTotalDurationAsync(videoIds);
-        
-        Console.WriteLine($"Executed request for the requested data in {stopwatch.Elapsed.ToString()} time.");
-        await Context.Channel.SendMessageAsync($"Total time length is {duration.Days} days, {duration.Hours} hours," +
-                                               $" {duration.Minutes} minutes, and {duration.Seconds} seconds.");
-    }
-
-    private async Task<TimeSpan> GetVideoListTotalDurationAsync(List<string> videoIds)
-    {
-        var request = _youtubeClientService.VideoResource.List();
-        request.Parts.Add("contentDetails");
-        request.MaxResults = 50;
-
-        TimeSpan duration = TimeSpan.Zero;
-        while (videoIds.Count > 0)
-        {
-            // Find the amount of total videos we are going to request (up to 50), retrieve them from our list starting from the first index, remove the items from the list
-            int removeAmount = Math.Min(50, videoIds.Count);
-            var ids = videoIds.GetRange(0, removeAmount);
-            videoIds.RemoveRange(0, removeAmount);
-            request.Ids = ids;
-            var videoResponse = await request.ExecuteRequestAsync();
-
-            // Convert Youtube's ISO 8601 time standard into a TimeSpan and add that to our total duration
-            videoResponse.Items.ForEach(
-                item => duration = duration.Add(XmlConvert.ToTimeSpan(item.ContentDetails.Duration)));
+            var stopwatch = Stopwatch.StartNew();
+            var duration =
+                await YoutubeHelpers.YoutubeHelpers.FindPlaylistDurationLeftFromVideoAsync(playlistId, videoId,
+                    _youtubeClientService);
+            Console.WriteLine($"Executed request for the requested data in {stopwatch.Elapsed.ToString()} time.");
+            await Context.Channel.SendMessageAsync(
+                $"Total time length is {duration.Days} days, {duration.Hours} hours," +
+                $" {duration.Minutes} minutes, and {duration.Seconds} seconds.");
         }
-
-        return duration;
-    }
-
-    private async Task<List<YoutubeResponseDataWrapper<YoutubePlaylistItem>>> GetAllPlaylistItemsInternalAsync(YoutubePlaylistItemListServiceRequest request)
-    {
-        List<YoutubeResponseDataWrapper<YoutubePlaylistItem>> items =
-            new List<YoutubeResponseDataWrapper<YoutubePlaylistItem>>();
-        
-        do
+        catch (YoutubeInvalidRequestException e)
         {
-            var response = await request.ExecuteRequestAsync();
-            items.Add(response);
-            request.PageToken = response.NextPageToken;
-
-        } while (request.PageToken != null);
-
-        return items;
+            Console.WriteLine($"Exception occured while trying to retrieve request data. \n {e.Message}");
+            await Context.Channel.SendMessageAsync("Unable to handle request!");
+        }
     }
 }
