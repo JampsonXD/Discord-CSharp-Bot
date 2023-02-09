@@ -146,7 +146,7 @@ public partial class SpotifyPlaylists
             public object PrimaryColor { get; set; }
 
             [JsonProperty("track")]
-            public Track Track { get; set; }
+            public SpotifyTrack SpotifyTrack { get; set; }
 
             [JsonProperty("video_thumbnail")]
             public VideoThumbnail VideoThumbnail { get; set; }

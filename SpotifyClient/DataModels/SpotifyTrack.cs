@@ -2,7 +2,7 @@
 
 namespace SpotifyClient.DataModels;
 
-public class Track
+public class SpotifyTrack
 {
     [JsonProperty("album")]
     public SpotifyAlbum SpotifyAlbum { get; set; }
