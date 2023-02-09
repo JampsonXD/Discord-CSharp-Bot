@@ -6,6 +6,8 @@ public interface ITimedTask
 
     public Task ExecuteTask();
 
+    public Task ResetTask();
+
     public Task InitializeTask(IServiceProvider serviceProvider);
     
 }

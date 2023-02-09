@@ -25,8 +25,14 @@ public class TimedTask : ITimedTask
         Action?.Invoke();
     }
 
-    public async Task InitializeTask(IServiceProvider serviceProvider)
+    public Task ResetTask()
     {
         _taskFinishTime = DateTime.UtcNow + _interval;
+        return Task.CompletedTask;
+    }
+
+    public Task InitializeTask(IServiceProvider serviceProvider)
+    {
+        return Task.CompletedTask;
     }
 }

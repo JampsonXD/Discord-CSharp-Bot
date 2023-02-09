@@ -4,68 +4,81 @@ namespace DiscordBot.Modules.TimedEvents;
 
 public class TimedTaskHandler
 {
-    private List<ITimedTask> _timedTasks;
-    private bool _endTask;
+    private readonly List<ITimedTask> _timedTasks;
+    private CancellationTokenSource _cancellationTokenSource;
+    private bool _taskActive;
     private readonly IServiceProvider _serviceProvider;
-    private SemaphoreSlim _mutex = new SemaphoreSlim(1, 1);
+    private readonly object _lock = new();
 
     public TimedTaskHandler(IServiceProvider serviceProvider)
     {
         _timedTasks = new List<ITimedTask>();
-        _endTask = false;
+        _taskActive = false;
         _serviceProvider = serviceProvider;
+        _cancellationTokenSource = new CancellationTokenSource();
     }
 
-    public async Task Run()
+    public void Start()
     {
-        // Initialize the tasks
-        _timedTasks.ForEach(task => task.InitializeTask(_serviceProvider));
-        
-        // Continue our loop until we are asked to stop the tasks
-        while (!_endTask)
+        if (!_taskActive)
         {
-            await _mutex.WaitAsync();
-            try
-            {
-                foreach (ITimedTask task in _timedTasks)
-                {
-                    if (task.CanExecuteTask().Result)
-                    {
-                        task.ExecuteTask();
-                        task.InitializeTask(_serviceProvider);
-                    }
-                }
-            }
-            finally
-            {
-                _mutex.Release();
-            }
+            _taskActive = true;
+            _cancellationTokenSource = new CancellationTokenSource();
+            Task.Run(() => Run(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
         }
     }
 
+    private Task Run(CancellationToken token)
+    {
+        // Initialize the tasks
+        lock (_lock)
+        {
+            Task.WaitAll(_timedTasks.Select(task => task.InitializeTask(_serviceProvider)).ToArray());
+        }
+
+        // Continue our loop until we are asked to stop the tasks
+        while (!token.IsCancellationRequested)
+        {
+            lock (_lock)
+            {
+                var tasks = _timedTasks.Select(HandleTask);
+                Task.WaitAll(tasks.ToArray(), token);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleTask(ITimedTask task)
+    {
+        if (task.CanExecuteTask().Result)
+        {
+            await task.ExecuteTask();
+            await task.ResetTask();
+        }
+    }
+    
     public void Stop()
     {
-        _endTask = true;
+        if (_taskActive)
+        {
+            _taskActive = true;
+            _cancellationTokenSource.Cancel();
+        }
     }
 
     public void AddTask(ITimedTask newTask)
     {
-        _mutex.Wait();
-        try
+        lock (_lock)
         {
             _timedTasks.Add(newTask);
             newTask.InitializeTask(_serviceProvider);
-        }
-        finally
-        {
-            _mutex.Release();
         }
     }
 
     public bool FindTask(Func<ITimedTask, bool> func, out ITimedTask? foundTask)
     {
-        _mutex.Wait();
-        try
+        lock (_lock)
         {
             foundTask = null;
             foreach (var task in _timedTasks)
@@ -77,24 +90,15 @@ public class TimedTaskHandler
                 }
             }
         }
-        finally
-        {
-            _mutex.Release();
-        }
 
         return false;
     }
     
     public void RemoveTask(ITimedTask task)
     {
-        _mutex.Wait();
-        try
+        lock (_lock)
         {
             _timedTasks.Remove(task);
-        }
-        finally
-        {
-            _mutex.Release();
         }
     }
 }

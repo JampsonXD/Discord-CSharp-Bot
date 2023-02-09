@@ -45,9 +45,9 @@ public class NewYoutubeVideoTimedTask: ITimedTask
         _discordUserId = discordUserId;
     }
 
-    public async Task<bool> CanExecuteTask()
+    public Task<bool> CanExecuteTask()
     {
-        return DateTime.UtcNow > _canExecuteTime;
+        return Task.FromResult(DateTime.UtcNow > _canExecuteTime);
     }
 
     public async Task ExecuteTask()
@@ -67,14 +67,21 @@ public class NewYoutubeVideoTimedTask: ITimedTask
         }
     }
 
+    public Task ResetTask()
+    {
+        _canExecuteTime = DateTime.UtcNow + _interval;
+        return Task.CompletedTask;
+    }
+
     private bool IsWithinPublishingWindow(YoutubePlaylistItem playlistItem)
     {
         return playlistItem.Snippet != null && playlistItem.Snippet.PublishedAt.ToUniversalTime() >
             DateTime.UtcNow.Subtract(_interval + _offset);
     }
 
-    public async Task InitializeTask(IServiceProvider serviceProvider)
+    public Task InitializeTask(IServiceProvider serviceProvider)
     {
         _canExecuteTime = DateTime.UtcNow + _interval;
+        return Task.CompletedTask;
     }
 }
