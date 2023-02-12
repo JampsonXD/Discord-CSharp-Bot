@@ -5,19 +5,17 @@ namespace YoutubeClient.Models;
 // Represents a youtube channel and details that are given back from the api call
 public class YoutubeChannel
 {
-    internal YoutubeChannel() {}
-    
     // Type of content/response we contain
     [JsonProperty("kind")] 
-    public string Kind { get; set; }
+    public required string Kind { get; set; }
     
     // The e tag of this resource
     [JsonProperty("etag")]
-    public string ETag { get; set; }
+    public required string ETag { get; set; }
     
     // The id of the channel resource
     [JsonProperty("id")] 
-    public string Id { get; set; }
+    public required string Id { get; set; }
     
     [JsonProperty("contentDetails")]
     public YoutubeChannelContentDetails? ContentDetails { get; set; }
@@ -26,16 +24,12 @@ public class YoutubeChannel
 
 public class YoutubeChannelContentDetails
 {
-    internal YoutubeChannelContentDetails() {}
-
     [JsonProperty("relatedPlaylists")]
-    public YoutubeChannelRelatedPlaylists RelatedPlaylists { get; set; }
+    public required YoutubeChannelRelatedPlaylists RelatedPlaylists { get; set; }
 }
 
 public class YoutubeChannelRelatedPlaylists
 {
-    internal YoutubeChannelRelatedPlaylists() {}
-
     // Id for the liked videos of the related youtube channel
     [JsonProperty("likes")] 
     public string? LikedVideos { get; set; }

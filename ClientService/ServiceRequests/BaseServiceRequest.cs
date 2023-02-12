@@ -15,16 +15,24 @@ namespace ClientService.ServiceRequests;
 public abstract class BaseServiceRequest<T> : IServiceRequest<T>
 {
     public HttpMethod HttpMethod { get; protected set; }
-    public IList<string> UriParameters { get; private set; }
+
+    public IList<string> UriParameters => GetUriParameters();
+
     public abstract string RelativePath { get; }
     public IClientService ClientService { get; }
 
     private readonly List<PropertyInfo> _requestParameterProperties;
-    
 
+    protected BaseServiceRequest(ServiceRequestInitializer initializer)
+    {
+        HttpMethod = initializer.HttpMethod ?? HttpMethod.Get;
+        ClientService = initializer.ClientService ?? throw new InvalidOperationException();
+        _requestParameterProperties = new List<PropertyInfo>();
+        InitializeRequestParameterProperties();
+    }
+    
     public T ExecuteRequest()
     {
-        AddParameterAttributes();
         HttpRequestMessage message = CreateRequestMessage();
         var response = ClientService.HttpClient.Send(message);
         return ClientService.HandleHttpResponseMessage<T>(response);
@@ -32,21 +40,9 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
 
     public async Task<T> ExecuteRequestAsync()
     {
-        AddParameterAttributes();
         HttpRequestMessage message = CreateRequestMessage();
         var response = await ClientService.HttpClient.SendAsync(message);
         return ClientService.HandleHttpResponseMessage<T>(response);
-    }
-
-    protected BaseServiceRequest(ServiceRequestInitializer initializer)
-    {
-        HttpMethod = initializer.HttpMethod;
-        ClientService = initializer.ClientService;
-        UriParameters = new List<string>();
-
-        _requestParameterProperties = new List<PropertyInfo>();
-        InitializeRequestParameterProperties();
-        InitializeUriParameters();
     }
 
     protected virtual object? GetBody()
@@ -54,11 +50,19 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
         return null;
     }
 
-    protected virtual void InitializeUriParameters()
+    private IList<string> GetUriParameters()
+    {
+        var list = new List<string>();
+        AddStaticUriParameters(list);
+        AddUriParametersFromParameterAttributes(list);
+        return list;
+    }
+
+    protected virtual void AddStaticUriParameters(IList<string> parametersList)
     {
         if (!string.IsNullOrWhiteSpace(ClientService.ApiKey))
         {
-            UriParameters.Add($"key={ClientService.ApiKey}");
+            parametersList.Add($"key={ClientService.ApiKey}");
         }
     }
 
@@ -67,10 +71,12 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
     {
         StringBuilder builder = new StringBuilder();
         builder.Append(ClientService.BaseUri).Append(RelativePath);
-        if (UriParameters.Count > 0)
+        // Cache our parameters so we don't need to recalculate
+        var uriParams = UriParameters;
+        if (uriParams.Count > 0)
         {
             builder.Append("?");
-            builder.Append(UriParameters.Where(val => !string.IsNullOrWhiteSpace(val))
+            builder.Append(uriParams.Where(val => !string.IsNullOrWhiteSpace(val))
                 .Aggregate(string.Empty, (current, next) => current + "&" + next));
         }
 
@@ -85,7 +91,7 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
         if (body != null)
         {
             var json = JsonConvert.SerializeObject(body);
-            var content = new ByteArrayContent(System.Text.Encoding.UTF8.GetBytes(json));
+            var content = new ByteArrayContent(Encoding.UTF8.GetBytes(json));
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             message.Content = content;
         }
@@ -105,7 +111,7 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
         return !attribute.IsRequired || propertyValue != null;
     }
 
-    void AddParameterAttribute(RequestQueryParameter attribute, object? propertyValue)
+    string GetParameterAttribute(RequestQueryParameter attribute, object? propertyValue)
     {
         if (propertyValue != null)
         {
@@ -125,25 +131,16 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
             {
                 builder.Append(propertyValue);
             }
-            
-            UriParameters.Add(builder.ToString());
+
+            return builder.ToString();
         }
-    }
 
-    /* Wipes all items inside UriParameter that match parameter request attribute names */
-    void ClearParameterAttributes()
-    {
-        List<string> parameterNames = new List<string>();
-        _requestParameterProperties.ForEach(prop => parameterNames.Add(prop.GetCustomAttribute<RequestQueryParameter>().ParameterName));
-
-        // Remove all parameters that contain the entire custom parameter name
-         UriParameters = UriParameters.Where(parameter => parameterNames.All(name => parameter.Split('=', 2)[0] != name)).ToList();
+        return string.Empty;
     }
 
     /* Loops through all request parameter properties, validates them, and then adds them to our UriParameter list for request execution */
-    void AddParameterAttributes()
+    void AddUriParametersFromParameterAttributes(IList<string> list)
     {
-        ClearParameterAttributes();
         foreach (var prop in _requestParameterProperties)
         {
             // These requests have already been null checked and verified to have a Request Parameter Attribute when first initialized
@@ -159,7 +156,11 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
                 throw new Exception();
             }
             
-            AddParameterAttribute(attribute, value);
+            var parameterValue = GetParameterAttribute(attribute, value);
+            if (!string.IsNullOrWhiteSpace(parameterValue))
+            {
+                list.Add(parameterValue);
+            }
         }
     }
 }

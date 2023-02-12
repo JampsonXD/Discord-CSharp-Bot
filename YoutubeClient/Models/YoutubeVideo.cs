@@ -4,94 +4,79 @@ namespace YoutubeClient.Models;
 
 public class YoutubeVideo
 {
-    internal YoutubeVideo()
-    {
-        
-    }
-    
     // Type of content/response we contain
     [JsonProperty("kind")] 
-    public string Kind { get; set; }
+    public required string Kind { get; set; }
     
     // The e tag of this resource
     [JsonProperty("etag")]
-    public string ETag { get; set; }
+    public required string ETag { get; set; }
     
     // The id of the channel resource
     [JsonProperty("id")] 
-    public string Id { get; set; }
+    public required string Id { get; set; }
 
     [JsonProperty("snippet")] 
     public YoutubeVideoSnippet? Snippet { get; set; }
     
     [JsonProperty("contentDetails")]
-    public YoutubeVideoContentDetails ContentDetails { get; set; }
+    public YoutubeVideoContentDetails? ContentDetails { get; set; }
     
 }
 
 public class YoutubeVideoSnippet
 {
-    internal YoutubeVideoSnippet()
-    {
-        
-    }
-
     [JsonProperty("publishedAt")]
     public DateTime PublishedAt { get; set; }
     
     [JsonProperty("channelId")]
-    public string ChannelId { get; set; }
+    public required string ChannelId { get; set; }
     
     [JsonProperty("title")]
-    public string Title { get; set; }
+    public required string Title { get; set; }
     
     [JsonProperty("thumbnails")]
-    public Dictionary<string, YoutubeThumbnailData> Thumbnails { get; set; }
+    public required Dictionary<string, YoutubeThumbnailData> Thumbnails { get; set; }
     
     [JsonProperty("channelTitle")]
-    public string ChannelTitle { get; set; }
+    public required string ChannelTitle { get; set; }
     
     [JsonProperty("tags")]
-    public List<string> Tags { get; set; }
+    public List<string>? Tags { get; set; }
     
     [JsonProperty("categoryId")]
-    public string CategoryId { get; set; }
+    public required string CategoryId { get; set; }
     
     [JsonProperty("liveBroadcastContent")]
-    public string LiveBroadcastContent { get; set; }
+    public string? LiveBroadcastContent { get; set; }
     
     [JsonProperty("defaultLanguage")]
-    public string DefaultLanguage { get; set; }
+    public string? DefaultLanguage { get; set; }
     
     [JsonProperty("localized")]
     public YoutubeLocalizedData? Localized { get; set; }
     
     [JsonProperty("defaultAudioLanguage")]
-    public string DefaultAudioLanguage { get; set; }
+    public string? DefaultAudioLanguage { get; set; }
 }
 
 public class YoutubeVideoContentDetails
 {
-    internal YoutubeVideoContentDetails()
-    {
-        
-    }
-    
     /* The length of the video in ISO 8601 formatting */
     [JsonProperty("duration")]
-    public string Duration { get; set; }
+    public required string Duration { get; set; }
     
     /* Whether the video is in 2D or 3D */
     [JsonProperty("dimension")]
-    public string Dimension { get; set; }
+    public required string Dimension { get; set; }
     
     /* Whether the video is available in high or standard definition */
     [JsonProperty("definition")]
-    public string Definition { get; set; }
+    public required string Definition { get; set; }
     
     /* Indicates whether captions are available for the video */
     [JsonProperty("caption")]
-    public string Caption { get; set; }
+    public string? Caption { get; set; }
     
     /* Indicates whether the video represents licensed content,
      uploaded to a channel linked to a content partner and claimed by that partner */
@@ -100,15 +85,15 @@ public class YoutubeVideoContentDetails
     
     /* Contains information about which countries block/allow a video from being viewed */
     [JsonProperty("regionRestriction")]
-    public YoutubeRegionRestrictionData RegionRestriction { get; set; }
+    public YoutubeRegionRestrictionData? RegionRestriction { get; set; }
     
     /* Contains information regarding the videos rating under different rating schemes */
     [JsonProperty("contentRating")]
-    public YoutubeVideoContentRating ContentRating { get; set; }
+    public YoutubeVideoContentRating? ContentRating { get; set; }
     
     /* Specifies the projection format of the video (360 or rectangular) */
     [JsonProperty("projection")]
-    public string Projection { get; set; }
+    public required string Projection { get; set; }
     
     /* Whether the video uploader provided a custom thumbnail for the video (Only visible to video uploader) */
     [JsonProperty("hasCustomThumbnail")]
@@ -117,215 +102,210 @@ public class YoutubeVideoContentDetails
 
 public class YoutubeVideoContentRating
 {
-    internal YoutubeVideoContentRating()
-    {
-        
-    }
-    
     [JsonProperty("acbRating")]
-    public string AcbRating;
+    public string? AcbRating;
 
     [JsonProperty("agcomRating")]
-    public string AgcomRating;
+    public string? AgcomRating;
 
     [JsonProperty("anatelRating")]
-    public string AnatelRating;
+    public string? AnatelRating;
 
     [JsonProperty("bbfcRating")]
-    public string BbfcRating;
+    public string? BbfcRating;
 
     [JsonProperty("bfvcRating")]
-    public string BfvcRating;
+    public string? BfvcRating;
 
     [JsonProperty("bmukkRating")]
-    public string BmukkRating;
+    public string? BmukkRating;
 
     [JsonProperty("catvRating")]
-    public string CatvRating;
+    public string? CatvRating;
 
     [JsonProperty("catvfrRating")]
-    public string CatvfrRating;
+    public string? CatvfrRating;
 
     [JsonProperty("cbfcRating")]
-    public string CbfcRating;
+    public string? CbfcRating;
 
     [JsonProperty("cccRating")]
-    public string CccRating;
+    public string? CccRating;
 
     [JsonProperty("cceRating")]
-    public string CceRating;
+    public string? CceRating;
 
     [JsonProperty("chfilmRating")]
-    public string ChfilmRating;
+    public string? ChfilmRating;
 
     [JsonProperty("chvrsRating")]
-    public string ChvrsRating;
+    public string? ChvrsRating;
 
     [JsonProperty("cicfRating")]
-    public string CicfRating;
+    public string? CicfRating;
 
     [JsonProperty("cnaRating")]
-    public string CnaRating;
+    public string? CnaRating;
 
     [JsonProperty("cncRating")]
-    public string CncRating;
+    public string? CncRating;
 
     [JsonProperty("csaRating")]
-    public string CsaRating;
+    public string? CsaRating;
 
     [JsonProperty("cscfRating")]
-    public string CscfRating;
+    public string? CscfRating;
 
     [JsonProperty("czfilmRating")]
-    public string CzfilmRating;
+    public string? CzfilmRating;
 
     [JsonProperty("djctqRating")]
-    public string DjctqRating;
+    public string? DjctqRating;
 
     [JsonProperty("djctqRatingReasons")]
-    public List<string> DjctqRatingReasons;
+    public List<string>? DjctqRatingReasons;
 
     [JsonProperty("ecbmctRating")]
-    public string EcbmctRating;
+    public string? EcbmctRating;
 
     [JsonProperty("eefilmRating")]
-    public string EefilmRating;
+    public string? EefilmRating;
 
     [JsonProperty("egfilmRating")]
-    public string EgfilmRating;
+    public string? EgfilmRating;
 
     [JsonProperty("eirinRating")]
-    public string EirinRating;
+    public string? EirinRating;
 
     [JsonProperty("fcbmRating")]
-    public string FcbmRating;
+    public string? FcbmRating;
 
     [JsonProperty("fcoRating")]
-    public string FcoRating;
+    public string? FcoRating;
 
     [JsonProperty("fmocRating")]
-    public string FmocRating;
+    public string? FmocRating;
 
     [JsonProperty("fpbRating")]
-    public string FpbRating;
+    public string? FpbRating;
 
     [JsonProperty("fpbRatingReasons")]
-    public List<string> FpbRatingReasons;
+    public List<string>? FpbRatingReasons;
 
     [JsonProperty("fskRating")]
-    public string FskRating;
+    public string? FskRating;
 
     [JsonProperty("grfilmRating")]
-    public string GrfilmRating;
+    public string? GrfilmRating;
 
     [JsonProperty("icaaRating")]
-    public string IcaaRating;
+    public string? IcaaRating;
 
     [JsonProperty("ifcoRating")]
-    public string IfcoRating;
+    public string? IfcoRating;
 
     [JsonProperty("ilfilmRating")]
-    public string IlfilmRating;
+    public string? IlfilmRating;
 
     [JsonProperty("incaaRating")]
-    public string IncaaRating;
+    public string? IncaaRating;
 
     [JsonProperty("kfcbRating")]
-    public string KfcbRating;
+    public string? KfcbRating;
 
     [JsonProperty("kijkwijzerRating")]
-    public string KijkwijzerRating;
+    public string? KijkwijzerRating;
 
     [JsonProperty("kmrbRating")]
-    public string KmrbRating;
+    public string? KmrbRating;
 
     [JsonProperty("lsfRating")]
-    public string LsfRating;
+    public string? LsfRating;
 
     [JsonProperty("mccaaRating")]
-    public string MccaaRating;
+    public string? MccaaRating;
 
     [JsonProperty("mccypRating")]
-    public string MccypRating;
+    public string? MccypRating;
 
     [JsonProperty("mcstRating")]
-    public string McstRating;
+    public string? McstRating;
 
     [JsonProperty("mdaRating")]
-    public string MdaRating;
+    public string? MdaRating;
 
     [JsonProperty("medietilsynetRating")]
-    public string MedietilsynetRating;
+    public string? MedietilsynetRating;
 
     [JsonProperty("mekuRating")]
-    public string MekuRating;
+    public string? MekuRating;
 
     [JsonProperty("mibacRating")]
-    public string MibacRating;
+    public string? MibacRating;
 
     [JsonProperty("mocRating")]
-    public string MocRating;
+    public string? MocRating;
 
     [JsonProperty("moctwRating")]
-    public string MoctwRating;
+    public string? MoctwRating;
 
     [JsonProperty("mpaaRating")]
-    public string MpaaRating;
+    public string? MpaaRating;
 
     [JsonProperty("mpaatRating")]
-    public string MpaatRating;
+    public string? MpaatRating;
 
     [JsonProperty("mtrcbRating")]
-    public string MtrcbRating;
+    public string? MtrcbRating;
 
     [JsonProperty("nbcRating")]
-    public string NbcRating;
+    public string? NbcRating;
 
     [JsonProperty("nbcplRating")]
-    public string NbcplRating;
+    public string? NbcplRating;
 
     [JsonProperty("nfrcRating")]
-    public string NfrcRating;
+    public string? NfrcRating;
 
     [JsonProperty("nfvcbRating")]
-    public string NfvcbRating;
+    public string? NfvcbRating;
 
     [JsonProperty("nkclvRating")]
-    public string NkclvRating;
+    public string? NkclvRating;
 
     [JsonProperty("oflcRating")]
-    public string OflcRating;
+    public string? OflcRating;
 
     [JsonProperty("pefilmRating")]
-    public string PefilmRating;
+    public string? PefilmRating;
 
     [JsonProperty("rcnofRating")]
-    public string RcnofRating;
+    public string? RcnofRating;
 
     [JsonProperty("resorteviolenciaRating")]
-    public string ResorteviolenciaRating;
+    public string? ResorteviolenciaRating;
 
     [JsonProperty("rtcRating")]
-    public string RtcRating;
+    public string? RtcRating;
 
     [JsonProperty("rteRating")]
-    public string RteRating;
+    public string? RteRating;
 
     [JsonProperty("russiaRating")]
-    public string RussiaRating;
+    public string? RussiaRating;
 
     [JsonProperty("skfilmRating")]
-    public string SkfilmRating;
+    public string? SkfilmRating;
 
     [JsonProperty("smaisRating")]
-    public string SmaisRating;
+    public string? SmaisRating;
 
     [JsonProperty("smsaRating")]
-    public string SmsaRating;
+    public string? SmsaRating;
 
     [JsonProperty("tvpgRating")]
-    public string TvpgRating;
+    public string? TvpgRating;
 
     [JsonProperty("ytRating")]
-    public string YtRating;
+    public string? YtRating;
 }

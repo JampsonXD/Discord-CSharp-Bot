@@ -15,14 +15,15 @@ public class TimedTask : ITimedTask
         Action = action;
     }
     
-    public async Task<bool> CanExecuteTask()
+    public Task<bool> CanExecuteTask()
     {
-        return DateTime.UtcNow > _taskFinishTime;
+        return Task.FromResult(DateTime.UtcNow > _taskFinishTime);
     }
 
-    public async Task ExecuteTask()
+    public Task ExecuteTask()
     {
         Action?.Invoke();
+        return Task.CompletedTask;
     }
 
     public Task ResetTask()

@@ -14,7 +14,7 @@ public class YoutubeSearchServiceRequest: YoutubeServiceRequest<YoutubeSearch>
 
     /* Specifies that a search should only contain results from a specified channel */
     [RequestQueryParameter("channelId")]
-    public string ChannelId { get; set; }
+    public string? ChannelId { get; set; }
     
     /* Specifies the maximum amount of search results to be returned */
     [RequestQueryParameter("maxResults")]
@@ -30,7 +30,7 @@ public class YoutubeSearchServiceRequest: YoutubeServiceRequest<YoutubeSearch>
 
     /* Query string to be sent with the request */
     [RequestQueryParameter("q", true)]
-    public string Query { get; set; }
+    public string Query { get; set; } = string.Empty;
     
     /* Specifies the type of resource we want to search for (videos, channels, playlists) */
     [RequestQueryParameter("type")]

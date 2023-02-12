@@ -42,7 +42,7 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
             request.SetSearchType(YoutubeSearchType.Channel);
 
             var response = await request.ExecuteRequestAsync();
-            var foundChannels = response.Items.Select(item => item.Snippet.ChannelTitle)
+            var foundChannels = response.Items.Select(item => item.Snippet?.ChannelTitle)
                 .Aggregate(string.Empty, (total, next) => total + "," + next);
             foundChannels = foundChannels.Remove(0, 1);
             await Context.Channel.SendMessageAsync(foundChannels);

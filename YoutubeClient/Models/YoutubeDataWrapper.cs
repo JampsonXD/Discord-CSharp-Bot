@@ -20,15 +20,13 @@ public class YoutubeResponsePageInfo
  */
 public class YoutubeResponseDataWrapper<T>
 {
-    internal YoutubeResponseDataWrapper() {}
-
     // Type of content/response we contain
     [JsonProperty("kind")] 
-    public string Kind { get; set; }
+    public required string Kind { get; set; }
     
     // The e tag of this resource (Useful for checking if a resource has changed or not)
     [JsonProperty("etag")]
-    public string ETag { get; set; }
+    public required string ETag { get; set; }
     
     // Token that can be used as a value of pageToken parameter to get the next page in a result set
     [JsonProperty("nextPageToken")]
@@ -39,11 +37,10 @@ public class YoutubeResponseDataWrapper<T>
     public string? PreviousPageToken { get; set; }
     
     // Encapsulates paging info for a result set
-    [JsonProperty("pageInfo")]
-    public YoutubeResponsePageInfo PageInfo { get; set; }
+    [JsonProperty("pageInfo")] public YoutubeResponsePageInfo? PageInfo { get; set; }
     
     // list of resources that are returned from a response, this varies based on the response content type
     [JsonProperty("items")]
-    public List<T> Items { get; set; }
+    public required List<T> Items { get; set; }
     
 }

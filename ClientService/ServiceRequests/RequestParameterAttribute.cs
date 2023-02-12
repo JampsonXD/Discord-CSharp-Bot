@@ -1,7 +1,7 @@
 ﻿namespace ClientService.ServiceRequests;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class RequestQueryParameter: System.Attribute
+public class RequestQueryParameter: Attribute
 {
     public string ParameterName { get; }
     public bool IsRequired { get; }

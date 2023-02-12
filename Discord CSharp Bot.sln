@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyClient", "SpotifyCli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBot", "DiscordBot\DiscordBot.csproj", "{E06891CD-CF5E-44DB-BF80-35B5CA7CFB50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaplingClient", "SaplingClient\SaplingClient.csproj", "{8AF93A6C-3638-4961-84AD-21B5554D1509}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{E06891CD-CF5E-44DB-BF80-35B5CA7CFB50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E06891CD-CF5E-44DB-BF80-35B5CA7CFB50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E06891CD-CF5E-44DB-BF80-35B5CA7CFB50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AF93A6C-3638-4961-84AD-21B5554D1509}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AF93A6C-3638-4961-84AD-21B5554D1509}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AF93A6C-3638-4961-84AD-21B5554D1509}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AF93A6C-3638-4961-84AD-21B5554D1509}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

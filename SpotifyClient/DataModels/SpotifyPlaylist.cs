@@ -74,7 +74,7 @@ public partial class SpotifyPlaylists
         public partial class SpotifyExternalUrls
         {
             [JsonProperty("spotify")]
-            public string Spotify { get; set; }
+            public string? Spotify { get; set; }
         }
 
         public partial class SpotifyPlaylistOwner

@@ -6,10 +6,10 @@ using Discord;
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
-using DiscordBot.Modules.Sapling;
 using DiscordBot.Modules.TimedEvents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SaplingClient.Services;
 using SpotifyClient.Services;
 using YoutubeClient.Services;
 using RunMode = Discord.Commands.RunMode;
@@ -103,8 +103,12 @@ namespace DiscordBot
                         TokenRequestUri = new Uri("https://accounts.spotify.com/api/token")
                     })))
                 }))
+                .AddSingleton<SaplingClientService>(provider => new SaplingClientService(new ClientServiceInitializer()
+                {
+                    ApiKey = provider.GetRequiredService<IConfiguration>()["SaplingApiKey"] ?? throw new InvalidOperationException(),
+                    HttpClient = provider.GetRequiredService<HttpClient>()
+                }))
                 .AddSingleton<CommandHandleService>()
-                .AddSingleton<SaplingApiClient>()
                 .AddScoped<Random>()
                 .AddSingleton<TimedTaskHandler>()
                 .BuildServiceProvider();

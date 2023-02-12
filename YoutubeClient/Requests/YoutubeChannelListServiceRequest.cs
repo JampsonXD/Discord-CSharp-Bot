@@ -11,7 +11,7 @@ public class YoutubeChannelListServiceRequest: YoutubeServiceRequest<YoutubeChan
     public List<string> Parts { get; set; }
     
     [RequestQueryParameter("id", true)]
-    public string Id { get; set; }
+    public string? Id { get; set; }
     
     [RequestQueryParameter("forUsername")]
     public string? ForUsername { get; set; }

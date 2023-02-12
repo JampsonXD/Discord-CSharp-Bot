@@ -4,6 +4,6 @@ namespace ClientService.ServiceRequests;
 
 public class ServiceRequestInitializer
 {
-    public HttpMethod HttpMethod { get; set; }
-    public IClientService ClientService { get; set; }
+    public required HttpMethod HttpMethod { get; set; }
+    public required IClientService ClientService { get; set; }
 }

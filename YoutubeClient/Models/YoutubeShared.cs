@@ -6,7 +6,7 @@ public class YoutubeThumbnailData
 {
     // The thumbnail's Url
     [JsonProperty("url")]
-    public string Url { get; set; }
+    public required string Url { get; set; }
     
     // Width of the thumbnail
     [JsonProperty("width")]
@@ -20,10 +20,10 @@ public class YoutubeThumbnailData
 public class YoutubeLocalizedData
 {
     [JsonProperty("title")]
-    public string Title { get; set; }
+    public required string Title { get; set; }
     
     [JsonProperty("description")]
-    public string Description { get; set; }
+    public required string Description { get; set; }
 }
 
 /* Contains information about which countries content is allowed or blocked from.*/

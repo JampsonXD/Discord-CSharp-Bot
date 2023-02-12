@@ -19,7 +19,7 @@ public static class YoutubeHelpers
         // Get each video id for each list of items in each of our wrapper response objects
         var videoIds = (from wrapper in playlistItems
             from playlistValues in wrapper.Items
-            select playlistValues.Snippet.ResourceId.VideoId).ToList();
+            select playlistValues.Snippet?.ResourceId.VideoId).ToList();
 
         TimeSpan duration = await GetVideoListTotalDurationAsync(videoIds, youtubeClient);
         return duration;
@@ -39,6 +39,7 @@ public static class YoutubeHelpers
             var playlistItems = await request.ExecuteRequestAsync();
             foreach (var item in playlistItems.Items)
             {
+                Debug.Assert(item.Snippet != null && item.Snippet.ResourceId.VideoId != null, "item.Snippet != null && item.Snippet.ResourceId.VideoId != null");
                 if (item.Snippet.ResourceId.VideoId == videoId)
                 {
                     request.PageToken = null;

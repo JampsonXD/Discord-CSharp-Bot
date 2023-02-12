@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using ClientService.ClientService;
 using Newtonsoft.Json;
 using YoutubeClient.Exceptions;
@@ -20,8 +21,9 @@ public class YoutubeClientService: IClientService
 
     public YoutubeClientService(ClientServiceInitializer serviceInitializer)
     {
+        Debug.Assert(serviceInitializer.ApiKey != null, "serviceInitializer.ApiKey != null");
         ApiKey = serviceInitializer.ApiKey;
-        HttpClient = serviceInitializer.HttpClient;
+        HttpClient = serviceInitializer.HttpClient ?? new HttpClient();
         ServiceName = "Youtube Client";
         BaseUri = "https://youtube.googleapis.com/youtube/v3/";
         PlaylistItemResource = new PlaylistItemResource(this);

@@ -67,32 +67,28 @@ static class YoutubeSearchResultsOrderExtensions
 
 public class YoutubeSearch
 {
-    internal YoutubeSearch() {}
-    
     // Type of content/response we contain
     [JsonProperty("kind")] 
-    public string Kind { get; set; }
+    public required string Kind { get; set; }
     
     // The e tag of this resource
     [JsonProperty("etag")]
-    public string ETag { get; set; }
+    public required string ETag { get; set; }
     
     // The id of the channel resource
     [JsonProperty("id")] 
-    public YoutubeSearchId Id { get; set; }
+    public required YoutubeSearchId Id { get; set; }
     
     [JsonProperty("snippet")]
-    public YoutubeSearchSnippet Snippet { get; set; }
+    public YoutubeSearchSnippet? Snippet { get; set; }
     
 }
 
 public class YoutubeSearchId
 {
-    internal YoutubeSearchId() {}
-    
     // Type of content/response we contain
     [JsonProperty("kind")] 
-    public string Kind { get; set; }
+    public required string Kind { get; set; }
     
     // If the search result type is a youtube video, this will be set to the videos id
     [JsonProperty("videoId")] 
@@ -109,31 +105,29 @@ public class YoutubeSearchId
 
 public class YoutubeSearchSnippet
 {
-    internal YoutubeSearchSnippet() {}
-    
     // The time at which the search result resource was created
     [JsonProperty("publishedAt")] 
     public DateTime PublishedAt { get; set; }
     
     // The channel id that published the search result resource
     [JsonProperty("channelId")] 
-    public string ChannelId { get; set; }
+    public required string ChannelId { get; set; }
     
     // Title of the search result
     [JsonProperty("title")] 
-    public string Title { get; set; }
+    public required string Title { get; set; }
     
     // Description of the search result
     [JsonProperty("description")] 
-    public string Description { get; set; }
+    public required string Description { get; set; }
     
     // Thumbnail information associated with the search result.
     [JsonProperty("thumbnails")] 
-    public YoutubeThumbnailData Thumbnails { get; set; }
+    public required YoutubeThumbnailData Thumbnails { get; set; }
     
     // Title of the channel that published the resource the search result identifies
     [JsonProperty("channelTitle")] 
-    public string ChannelTitle { get; set; }
+    public required string ChannelTitle { get; set; }
     
     // Indicates whether a video or channel resource has live broadcast content. Valid values are upcoming/live/none
     [JsonProperty("liveBroadcastContent")] 

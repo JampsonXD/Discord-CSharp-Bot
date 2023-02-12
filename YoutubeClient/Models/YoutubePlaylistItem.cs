@@ -4,19 +4,17 @@ namespace YoutubeClient.Models;
 
 public class YoutubePlaylistItem
 {
-    internal YoutubePlaylistItem() {}
-
     // Type of content/response we contain
     [JsonProperty("kind")] 
-    public string Kind { get; set; }
+    public required string Kind { get; set; }
     
     // The e tag of this resource
     [JsonProperty("etag")]
-    public string ETag { get; set; }
+    public required string ETag { get; set; }
     
     // The id of the channel resource
     [JsonProperty("id")] 
-    public string Id { get; set; }
+    public required string Id { get; set; }
 
     [JsonProperty("snippet")] 
     public YoutubePlaylistItemSnippet? Snippet { get; set; }
@@ -25,19 +23,17 @@ public class YoutubePlaylistItem
 /* Contains basic details about the playlist item, such as its title and position in the playlist */
 public class YoutubePlaylistItemSnippet
 {
-    internal YoutubePlaylistItemSnippet() {}
-    
     [JsonProperty("publishedAt")]
     public DateTime PublishedAt { get; set; }
     
     [JsonProperty("channelId")]
-    public string ChannelId { get; set; }
+    public required string ChannelId { get; set; }
     
     [JsonProperty("title")]
-    public string Title { get; set; }
+    public required string Title { get; set; }
     
     [JsonProperty("description")]
-    public string Description { get; set; }
+    public required string Description { get; set; }
     
     /* A map of thumbnail images associated with the playlist item.
      For each object in the map, the key is the name of the thumbnail image, 
@@ -62,41 +58,39 @@ public class YoutubePlaylistItemSnippet
      */
     
     [JsonProperty("thumbnails")] 
-    public Dictionary<string, YoutubeThumbnailData> Thumbnails { get; set; }
+    public required Dictionary<string, YoutubeThumbnailData> Thumbnails { get; set; }
     
     // Channel title that the playlist item belongs to
     [JsonProperty("channelTitle")]
-    public string ChannelTitle { get; set; }
+    public required string ChannelTitle { get; set; }
     
     // The channel title of the channel that uploaded the video
     [JsonProperty("videoOwnerChannelTitle")]
-    public string VideoOwnerChannelTitle { get; set; }
+    public required string VideoOwnerChannelTitle { get; set; }
     
     // The channel Id of the channel that uploaded this video
     [JsonProperty("videoOwnerChannelId")]
-    public string VideoOwnerChannelId { get; set; }
+    public required string VideoOwnerChannelId { get; set; }
     
     // The Id that youtube uses to uniquely identify the playlist that the playlist item is in
     [JsonProperty("playlistId")]
-    public string PlayListId { get; set; }
+    public required string PlayListId { get; set; }
     
     // The order in which the item appears in the playlist. Value uses a zero based index, so the first item has a position of 0, the second item has a position of 1, and so forth.
     [JsonProperty("position")]
     public uint Position { get; set; }
 
-    public class YoutubePlaylistItemSnippetResourceId
-    {
-        internal YoutubePlaylistItemSnippetResourceId() {}   
-        
-        // Kind/Type of referred resource
-        [JsonProperty("kind")]
-        public string Kind { get; set; }
-        
-        // If this resource is a youtube#video, this property will be present and its value will contain the Id that is used to identify the video in the playlist
-        [JsonProperty("videoId")]
-        public string VideoId { get; set; }
-    }
-    
     [JsonProperty("resourceId")]
-    public YoutubePlaylistItemSnippetResourceId ResourceId { get; set; }
+    public required YoutubePlaylistItemSnippetResourceId ResourceId { get; set; }
+}
+
+public class YoutubePlaylistItemSnippetResourceId
+{
+    // Kind/Type of referred resource
+    [JsonProperty("kind")]
+    public required string Kind { get; set; }
+        
+    // If this resource is a youtube#video, this property will be present and its value will contain the Id that is used to identify the video in the playlist
+    [JsonProperty("videoId")]
+    public string? VideoId { get; set; }
 }

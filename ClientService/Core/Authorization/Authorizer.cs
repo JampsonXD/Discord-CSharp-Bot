@@ -49,6 +49,6 @@ public class Authorizer: IAuthorizer
     private string EncodeMessage(string message)
     {
         var bytes = Encoding.UTF8.GetBytes(message);
-        return System.Convert.ToBase64String(bytes);
+        return Convert.ToBase64String(bytes);
     }
 }
