@@ -6,6 +6,7 @@ using DiscordBot.Modules.DiscordEmbeds;
 using DiscordBot.Modules.Sapling;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SaplingClient.Services;
 
 namespace DiscordBot
 {
@@ -14,12 +15,14 @@ namespace DiscordBot
         private readonly DiscordSocketClient _client;
         private readonly IServiceProvider _services;
         private readonly CommandService _commands;
+        private readonly SaplingClientService _saplingClient;
         
-        public CommandHandleService(IServiceProvider services)
+        public CommandHandleService(IServiceProvider services, SaplingClientService saplingClient)
         {
             _commands = services.GetRequiredService<CommandService>();
             _client = services.GetRequiredService<DiscordSocketClient>();
             _services = services;
+            _saplingClient = saplingClient;
             
             _client.MessageReceived += ClientOnMessageReceived;
             _client.Ready += ClientOnReady;
@@ -66,15 +69,15 @@ namespace DiscordBot
                 // If we find any id's that match our authors id, perform grammar and spelling checking
                 if (idList.Any(x => x == socketUserMessage.Author.Id))
                 {
-                    ValidateUserMessage(socketUserMessage);
+                    await ValidateUserMessage(socketUserMessage);
                 }
             }
         }
 
         private async Task ValidateUserMessage(SocketUserMessage socketUserMessage)
         {
-            var response = await _services.GetRequiredService<SaplingApiClient>()
-                .RequestGrammarCorrectionAsync(socketUserMessage.Content);
+            var request = _saplingClient.GrammarCorrectionResource.GrammarCheckingService();
+            var response = await SaplingClientHelpers.ConvertSaplingRequestIntoResponseData(socketUserMessage.Content, request);
 
             // Only alert users if our message was modified
             if (response.IsContentModified)

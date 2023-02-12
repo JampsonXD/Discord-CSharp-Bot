@@ -1,7 +1,6 @@
 ﻿using System.Text;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SaplingClient.Requests;
 
 namespace DiscordBot.Modules.Sapling
 {
@@ -10,7 +9,6 @@ namespace DiscordBot.Modules.Sapling
         private string _originalMessage;
         private string? _modifiedMessage;
         private bool _isContentModified;
-        private HttpResponseMessage? _httpResponseMessage;
 
         public string OriginalMessage { get => _originalMessage; set => _originalMessage = value; }
         public string? ModifiedMessage
@@ -23,67 +21,31 @@ namespace DiscordBot.Modules.Sapling
             }
         }
         public bool IsContentModified { get => _isContentModified; set => _isContentModified = value; }
-        public HttpResponseMessage? ResponseMessage { get => _httpResponseMessage; set => _httpResponseMessage = value; }
 
-        public SaplingResponseData(HttpResponseMessage? httpResponseMessage, string originalMessage)
+        public SaplingResponseData(string originalMessage)
         {
-            _httpResponseMessage = httpResponseMessage;
             _originalMessage = originalMessage;
             _modifiedMessage = null;
             _isContentModified = false;
         }
     }
-    
-    public class SaplingRequestContent
+
+    public static class SaplingClientHelpers
     {
-        public SaplingRequestContent(string apiToken, string content, string sessionId = "DefaultSessionId")
+
+        public static async Task<SaplingResponseData> ConvertSaplingRequestIntoResponseData(string message, GrammarCheckingServiceRequest request)
         {
-            ApiToken = apiToken;
-            Content = content;
-            SessionId = sessionId;
-        }
-
-        [JsonProperty("key")]
-        public string ApiToken { get; set; }
-        
-        [JsonProperty("text")]
-        public string Content { get; set; }
-        
-        [JsonProperty("session_id")]
-        public string SessionId { get; set; }
-    }
-    
-    public class SaplingApiClient
-    {
-        private readonly HttpClient _httpClient;
-        private readonly string _token;
-
-        public SaplingApiClient(HttpClient httpClient, IConfiguration configuration)
-        {
-            _httpClient = httpClient;
-            _token = configuration["SaplingApiKey"] ?? throw new InvalidOperationException($"{this.ToString()} failed to find YoutubeApiKey in configuration service!");
-        }
-
-        public async Task<SaplingResponseData> RequestGrammarCorrectionAsync(string message)
-        {
-            var json = CreateRequestJson(message);
-            var response = await _httpClient.PostAsync(
-                "https://api.sapling.ai/api/v1/edits",
-                new StringContent(json, Encoding.UTF8, "application/json"));
-
-            SaplingResponseData saplingResponseData = new SaplingResponseData(response, message);
-
-            JObject? jsonObject = JsonConvert.DeserializeObject<JObject>(await response.Content.ReadAsStringAsync());
-            if (jsonObject == null)
+            request.Message = message;
+            var response = await request.ExecuteRequestAsync();
+            SaplingResponseData saplingResponseData = new SaplingResponseData(message)
             {
-                return saplingResponseData;
-            }
+                ModifiedMessage = ParseGrammarResponseData(response, message)
+            };
 
-            saplingResponseData.ModifiedMessage = ParseGrammarResponseData(jsonObject, message);
             return saplingResponseData;
         }
 
-        private string ParseGrammarResponseData(JObject jObject, string originalMessage)
+        private static string ParseGrammarResponseData(JObject jObject, string originalMessage)
         {
             JArray? array = jObject["edits"]?.Value<JArray>();
             if (array == null || !array.HasValues)
@@ -124,10 +86,6 @@ namespace DiscordBot.Modules.Sapling
             }
 
             return newString.ToString();
-        }
-        private string CreateRequestJson(string message)
-        {
-            return JsonConvert.SerializeObject(new SaplingRequestContent(_token, message));
         }
     }
 }
