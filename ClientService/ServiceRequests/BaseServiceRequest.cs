@@ -25,7 +25,7 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
 
     protected BaseServiceRequest(ServiceRequestInitializer initializer)
     {
-        HttpMethod = initializer.HttpMethod ?? HttpMethod.Get;
+        HttpMethod = initializer.HttpMethod;
         ClientService = initializer.ClientService ?? throw new InvalidOperationException();
         _requestParameterProperties = new List<PropertyInfo>();
         InitializeRequestParameterProperties();
@@ -60,10 +60,7 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
 
     protected virtual void AddStaticUriParameters(IList<string> parametersList)
     {
-        if (!string.IsNullOrWhiteSpace(ClientService.ApiKey))
-        {
-            parametersList.Add($"key={ClientService.ApiKey}");
-        }
+        
     }
 
     /* Generates a Request Uri as a string to be used with our HttpRequest */

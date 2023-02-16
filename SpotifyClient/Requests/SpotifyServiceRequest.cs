@@ -8,9 +8,4 @@ public abstract class SpotifyServiceRequest<T>: BaseServiceRequest<T>
     {
         
     }
-
-    protected override void AddStaticUriParameters(IList<string> parametersList)
-    {
-        
-    }
 }

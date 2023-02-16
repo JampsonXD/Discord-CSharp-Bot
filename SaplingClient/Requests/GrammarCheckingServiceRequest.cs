@@ -30,8 +30,4 @@ public class GrammarCheckingServiceRequest: BaseServiceRequest<JObject>
             SessionId = "Default"
         };
     }
-    protected override void AddStaticUriParameters(IList<string> parametersList)
-    {
-        
-    }
 }
