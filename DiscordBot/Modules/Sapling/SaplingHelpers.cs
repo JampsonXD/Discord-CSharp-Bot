@@ -17,10 +17,10 @@ namespace DiscordBot.Modules.Sapling
             set
             {
                 this._modifiedMessage = value;
-                IsContentModified = _modifiedMessage != null && !_originalMessage.Equals(_modifiedMessage);
+                _isContentModified = _modifiedMessage != null && !_originalMessage.Equals(_modifiedMessage);
             }
         }
-        public bool IsContentModified { get => _isContentModified; set => _isContentModified = value; }
+        public bool IsContentModified { get => _isContentModified; }
 
         public SaplingResponseData(string originalMessage)
         {
@@ -33,13 +33,21 @@ namespace DiscordBot.Modules.Sapling
     public static class SaplingClientHelpers
     {
 
-        public static async Task<SaplingResponseData> ConvertSaplingRequestIntoResponseData(string message, GrammarCheckingServiceRequest request)
+        public static async Task<SaplingResponseData> ConvertSaplingRequestIntoResponseData(this GrammarCheckingServiceRequest request)
         {
-            request.Message = message;
-            var response = await request.ExecuteRequestAsync();
-            SaplingResponseData saplingResponseData = new SaplingResponseData(message)
+            // Return early if we our response message is null
+            if (request.Message == null)
             {
-                ModifiedMessage = ParseGrammarResponseData(response, message)
+                return new SaplingResponseData()
+                {
+                    ModifiedMessage = null
+                };
+            }
+            
+            var response = await request.ExecuteRequestAsync();
+            SaplingResponseData saplingResponseData = new SaplingResponseData(request.Message)
+            {
+                ModifiedMessage = ParseGrammarResponseData(response, request.Message)
             };
 
             return saplingResponseData;
