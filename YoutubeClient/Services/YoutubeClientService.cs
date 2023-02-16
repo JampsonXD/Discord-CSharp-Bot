@@ -31,7 +31,7 @@ public class YoutubeClientService: IClientService
         VideoResource = new VideoResource(this);
         SearchResource = new SearchResource(this);
     }
-    
+
     public T HandleHttpResponseMessage<T>(HttpResponseMessage response)
     {
         /* Make sure our response code is either successful or that the content was not modified,
