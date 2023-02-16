@@ -1,4 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
+
+using System.ComponentModel;
 using ClientService.ClientService;
 using ClientService.Core;
 using ClientService.Core.Authorization;
@@ -6,10 +8,13 @@ using Discord;
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
+using DiscordBot.Configuration;
 using DiscordBot.Modules.TimedEvents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SaplingClient.Services;
+using SpotifyClient.Authorization;
 using SpotifyClient.Services;
 using YoutubeClient.Services;
 using RunMode = Discord.Commands.RunMode;
@@ -28,7 +33,7 @@ namespace DiscordBot
             client.Log += ApplicationLog;
 
             // Get the discord token from our config file
-            var token = serviceProvider.GetRequiredService<IConfiguration>()["DiscordApiToken"];
+            var token = serviceProvider.GetRequiredService<IOptions<DiscordBotOptions>>().Value.Token;
 
             // Log our command services
             serviceProvider.GetRequiredService<CommandService>().Log += ApplicationLog;
@@ -65,10 +70,22 @@ namespace DiscordBot
 
         private static ServiceProvider GetServiceProvider()
         {
-            IConfiguration config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
+            IConfigurationRoot config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false).Build();
-            
-            return new ServiceCollection()
+
+            /* Add configuration options for each of our different services */
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddOptions<SpotifyAuthorizationOptions>()
+                .Configure(config.GetSection(SpotifyAuthorizationOptions.Position).Bind);
+            serviceCollection.AddOptions<YoutubeClientOptions>()
+                .Configure(config.GetSection(YoutubeClientOptions.Position).Bind);
+            serviceCollection.AddOptions<SaplingClientOptions>()
+                .Configure(config.GetSection(SaplingClientOptions.Position).Bind);
+            serviceCollection.AddOptions<DiscordBotOptions>()
+                .Configure(config.GetSection(DiscordBotOptions.Position).Bind);
+
+            /* Add all of our services */
+            return serviceCollection
                 .AddScoped<IConfiguration>(_ => config)
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
@@ -79,6 +96,7 @@ namespace DiscordBot
                 {
                     DefaultRunMode = Discord.Interactions.RunMode.Async
                 }))
+                .AddSingleton<IContainer>(new Container())
                 .AddSingleton<InteractionHandleService>()
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
@@ -90,22 +108,18 @@ namespace DiscordBot
                 .AddSingleton<HttpClient>()
                 .AddSingleton<YoutubeClientService>(provider => new YoutubeClientService(new ClientServiceInitializer()
                 {
-                    ApiKey = provider.GetRequiredService<IConfiguration>()["YoutubeApiKey"] ?? throw new InvalidOperationException(),
+                    ApiKey = provider.GetRequiredService<IOptions<YoutubeClientOptions>>().Value.ApiKey,
                     HttpClient = provider.GetRequiredService<HttpClient>()
                 }))
+                .AddSingleton<IAuthorizer, SpotifyAuthorizer>()
+                .AddSingleton<OAuthHttpHandler>()
                 .AddSingleton<SpotifyClientService>(provider => new SpotifyClientService(new ClientServiceInitializer()
                 {
-                    ApiKey = string.Empty, // Spotify Client does not use an ApiKey so this can be empty
-                    HttpClient = new HttpClient(new OAuthHttpHandler(new Authorizer(new AuthorizationConfigurationOptions()
-                    {
-                        ClientSecret = provider.GetRequiredService<IConfiguration>()["SpotifyClientSecret"] ?? throw new InvalidOperationException(),
-                        ClientId = provider.GetRequiredService<IConfiguration>()["SpotifyClientId"] ?? throw new InvalidOperationException(),
-                        TokenRequestUri = new Uri("https://accounts.spotify.com/api/token")
-                    })))
+                    HttpClient = new HttpClient(provider.GetRequiredService<OAuthHttpHandler>())
                 }))
                 .AddSingleton<SaplingClientService>(provider => new SaplingClientService(new ClientServiceInitializer()
                 {
-                    ApiKey = provider.GetRequiredService<IConfiguration>()["SaplingApiKey"] ?? throw new InvalidOperationException(),
+                    ApiKey = provider.GetRequiredService<IOptions<SaplingClientOptions>>().Value.ApiKey,
                     HttpClient = provider.GetRequiredService<HttpClient>()
                 }))
                 .AddSingleton<CommandHandleService>()

@@ -6,9 +6,9 @@ namespace ClientService.Core.Authorization;
 
 public class Authorizer: IAuthorizer
 {
-    private readonly AuthorizationConfigurationOptions _options;
+    private readonly IAuthorizationConfigurationOptions _options;
 
-    public Authorizer(AuthorizationConfigurationOptions options)
+    public Authorizer(IAuthorizationConfigurationOptions options)
     {
         _options = options;
     }

@@ -1,8 +1,8 @@
 ﻿namespace ClientService.Core.Authorization;
 
-public class AuthorizationConfigurationOptions
+public interface IAuthorizationConfigurationOptions
 {
-    public Uri? TokenRequestUri { get; set; }
-    public string? ClientSecret { get; set; }
-    public string? ClientId { get; set; }
+    public Uri TokenRequestUri { get;}
+    public string ClientSecret { get;}
+    public string ClientId { get;}
 }
