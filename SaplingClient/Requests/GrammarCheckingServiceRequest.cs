@@ -4,7 +4,7 @@ using SaplingClient.Models;
 
 namespace SaplingClient.Requests;
 
-public class GrammarCheckingServiceRequest: BaseServiceRequest<JObject>
+public class GrammarCheckingServiceRequest: BaseServiceRequest<SaplingGrammarResponse>
 {
     public string? Message { get; set; }
 
