@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Newtonsoft.Json.Linq;
+using SaplingClient.Models;
 using SaplingClient.Requests;
 
 namespace DiscordBot.Modules.Sapling
@@ -53,44 +53,27 @@ namespace DiscordBot.Modules.Sapling
             return saplingResponseData;
         }
 
-        private static string ParseGrammarResponseData(JObject jObject, string originalMessage)
+        private static string ParseGrammarResponseData(SaplingGrammarResponse response, string originalMessage)
         {
-            JArray? array = jObject["edits"]?.Value<JArray>();
-            if (array == null || !array.HasValues)
+            if (response.Edits.Count < 1)
             {
                 return originalMessage;
             }
 
             StringBuilder newString = new StringBuilder(originalMessage);
-            
-            var startPositions = new List<int>();
-            var endPositions = new List<int>();
-            var corrections = new List<string>();
-
-            // Cache each starting position, end position, correct word and mistake for each of our tokens
-            foreach (var token in array)
-            {
-                var startPosition = (token["start"] ?? throw new InvalidOperationException()).Value<int>();
-                var endPosition = (token["end"] ?? throw new InvalidOperationException()).Value<int>();
-                var replacement = (token["replacement"] ?? throw new InvalidOperationException()).Value<string>();
-                
-                startPositions.Add(startPosition);
-                endPositions.Add(endPosition);
-                corrections.Add(replacement);
-            }
 
             // How much our starting and end positions have changed from other grammar/spelling edits
             int offset = 0;
             
-            for (int i = 0; i < startPositions.Count; ++i)
+            foreach (var edit in response.Edits)
             {
                 // Get our starting and end positions based on the original value + the total offset from modifying the string
-                int start = startPositions[i] + offset;
-                int end = endPositions[i] + offset;
+                int start = edit.Start + offset;
+                int end = edit.End + offset;
                 int mistakeLength = end - start;
 
-                newString.Remove(start, mistakeLength).Insert(start, corrections[i]);
-                offset += corrections[i].Length - mistakeLength;
+                newString.Remove(start, mistakeLength).Insert(start, edit.Replacement);
+                offset += edit.Replacement.Length - mistakeLength;
             }
 
             return newString.ToString();
