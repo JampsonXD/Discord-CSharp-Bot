@@ -1,5 +1,6 @@
 ﻿using ClientService.ClientService;
 using Newtonsoft.Json;
+using SaplingClient.Exceptions;
 using SaplingClient.Resources;
 
 namespace SaplingClient.Services;
@@ -21,6 +22,17 @@ public class SaplingClientService: IClientService
     }
     public T HandleHttpResponseMessage<T>(HttpResponseMessage responseMessage)
     {
-        return JsonConvert.DeserializeObject<T>(responseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+        if (!responseMessage.IsSuccessStatusCode)
+        {
+            throw new SaplingInvalidResponseException(responseMessage.ReasonPhrase ?? responseMessage.StatusCode.ToString());
+        }
+        
+        var responseValue = JsonConvert.DeserializeObject<T>(responseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+        if (responseValue == null)
+        {
+            throw new SaplingInvalidResponseException($"Unable to parse Sapling Response JSON into {typeof(T)!}");
+        }
+
+        return responseValue;
     }
 }
