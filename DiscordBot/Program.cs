@@ -9,7 +9,9 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using DiscordBot.Configuration;
+using DiscordBot.Configuration.Validation;
 using DiscordBot.Modules.TimedEvents;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -75,18 +77,22 @@ namespace DiscordBot
 
             /* Add configuration options for each of our different services */
             var serviceCollection = new ServiceCollection();
+            serviceCollection.AddValidatorsFromAssemblyContaining<Program>();
+            
             serviceCollection.AddOptions<SpotifyAuthorizationOptions>()
-                .Configure(config.GetSection(SpotifyAuthorizationOptions.Position).Bind);
+                .Bind(config.GetSection(SpotifyAuthorizationOptions.Position));
             serviceCollection.AddOptions<YoutubeClientOptions>()
-                .Configure(config.GetSection(YoutubeClientOptions.Position).Bind);
+                .Bind(config.GetSection(YoutubeClientOptions.Position));
             serviceCollection.AddOptions<SaplingClientOptions>()
-                .Configure(config.GetSection(SaplingClientOptions.Position).Bind);
+                .Bind(config.GetSection(SaplingClientOptions.Position));
             serviceCollection.AddOptions<DiscordBotOptions>()
-                .Configure(config.GetSection(DiscordBotOptions.Position).Bind);
+                .Bind(config.GetSection(DiscordBotOptions.Position))
+                .ValidateFluently()
+                .ValidateOnStart();
 
             /* Add all of our services */
             return serviceCollection
-                .AddScoped<IConfiguration>(_ => config)
+                .AddSingleton<IConfiguration>(_ => config)
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     MessageCacheSize = 1000,
