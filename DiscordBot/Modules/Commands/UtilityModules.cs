@@ -4,11 +4,9 @@ namespace DiscordBot.Modules.Commands
 {
     public class UtilityModule : ModuleBase<SocketCommandContext>
     {
-        private readonly IServiceProvider _services;
-
-        public UtilityModule(IServiceProvider serviceProvider)
+        public UtilityModule()
         {
-            _services = serviceProvider;
+            
         }
         
         [Command("ping")]

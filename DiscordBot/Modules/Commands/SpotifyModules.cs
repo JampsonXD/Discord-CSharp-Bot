@@ -1,19 +1,16 @@
 ﻿using Discord.Commands;
 using DiscordBot.Modules.DiscordEmbeds;
-using Microsoft.Extensions.DependencyInjection;
 using SpotifyClient.Services;
 
 namespace DiscordBot.Modules.Commands;
 
 public class SpotifyModules: ModuleBase<SocketCommandContext>
 {
-    private readonly IServiceProvider _services;
     private readonly SpotifyClientService _spotifyClientService;
 
-    public SpotifyModules(IServiceProvider serviceProvider)
+    public SpotifyModules(SpotifyClientService spotifyClientService)
     {
-        _services = serviceProvider;
-        _spotifyClientService = _services.GetRequiredService<SpotifyClientService>();
+        _spotifyClientService = spotifyClientService;
     }
     
     [Command("FindSpotifyAlbum")]

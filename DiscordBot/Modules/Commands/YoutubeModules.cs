@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using DiscordBot.Modules.DiscordEmbeds;
 using DiscordBot.Modules.TimedEvents;
 using DiscordBot.Modules.TimedEvents.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
 using YoutubeClient.Exceptions;
 using YoutubeClient.Models;
 using YoutubeClient.Requests;
@@ -14,18 +13,19 @@ namespace DiscordBot.Modules.Commands;
 
 public class YoutubeModule : ModuleBase<SocketCommandContext>
 {
-    private readonly IServiceProvider _services;
     private readonly YoutubeClientService _youtubeClientService;
     private readonly YoutubeChannelListServiceRequest _ludwigServiceRequest;
-    
-    public YoutubeModule(IServiceProvider serviceProvider)
+    private readonly TimedTaskHandler _timedTaskHandler;
+    private readonly DiscordSocketClient _discordSocketClient;
+
+    public YoutubeModule(YoutubeClientService youtubeClientService, TimedTaskHandler timedTaskHandler, DiscordSocketClient discordSocketClient)
     {
-        _services = serviceProvider;
-        _youtubeClientService = _services.GetRequiredService<YoutubeClientService>();
-        
+        _youtubeClientService = youtubeClientService;
         _ludwigServiceRequest = _youtubeClientService.ChannelResource.List();
         _ludwigServiceRequest.Id = "UCjK0F1DopxQ5U0sCwOlXwOg";
         _ludwigServiceRequest.Parts.Add("contentDetails");
+        _timedTaskHandler = timedTaskHandler;
+        _discordSocketClient = discordSocketClient;
     }
 
     [Command("SearchYoutubeChannel")]
@@ -97,12 +97,9 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
     [Summary("Creates a new task to notify a user for youtube video uploads")]
     public async Task NotifyNewYoutubeVideoAsync(int interval, string channelPlaylistId)
     {
-        var timedTaskHandler = _services.GetService<TimedTaskHandler>();
-        if (timedTaskHandler != null)
-        {
-            timedTaskHandler.AddTask(new NewYoutubeVideoTimedTask(TimeSpan.FromMinutes(interval), channelPlaylistId, Context.User.Id, _youtubeClientService, _services.GetRequiredService<DiscordSocketClient>()));
+        _timedTaskHandler.AddTask(new NewYoutubeVideoTimedTask(
+            TimeSpan.FromMinutes(interval), channelPlaylistId, Context.User.Id, _youtubeClientService, _discordSocketClient));
             await Context.Channel.SendMessageAsync("Successfully added new notification alert!");
-        }
     }
 
     [Command("UnNotifyMe")]
@@ -110,14 +107,8 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
     [Summary("Removes a youtube task from the tasks being executed, if found")]
     public async Task UnNotifyYoutubeVideoAsync(string channelPlaylistId)
     {
-        var timedTaskHandler = _services.GetService<TimedTaskHandler>();
-        if (timedTaskHandler == null)
-        {
-            return;
-        }
-        
-            // Find a task that is a YoutubeVideoTimedTask and has the same discord user id and playlist id
-        if (timedTaskHandler.FindTask(currentTask =>
+        // Find a task that is a YoutubeVideoTimedTask and has the same discord user id and playlist id
+        if (_timedTaskHandler.FindTask(currentTask =>
             {
                 var youtubeTask = currentTask as NewYoutubeVideoTimedTask;
                 if (youtubeTask == null) return false;
@@ -127,7 +118,7 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
 
             }, out ITimedTask? task) && task != null)
         {
-            timedTaskHandler.RemoveTask(task);
+            _timedTaskHandler.RemoveTask(task);
             await Context.Message.Channel.SendMessageAsync("Successfully removed notification!");
         }
     }
