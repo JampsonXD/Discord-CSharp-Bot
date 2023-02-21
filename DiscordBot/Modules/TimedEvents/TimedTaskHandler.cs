@@ -76,6 +76,19 @@ public class TimedTaskHandler
         }
     }
 
+    public void AddTasks(IEnumerable<ITimedTask> tasks)
+    {
+        lock (_lock)
+        {
+            var newTasks = tasks.ToArray();
+            _timedTasks.AddRange(newTasks);
+            foreach (var task in newTasks)
+            {
+                task.InitializeTask(_serviceProvider);
+            }
+        }
+    }
+
     public bool FindTask(Func<ITimedTask, bool> func, out ITimedTask? foundTask)
     {
         lock (_lock)
