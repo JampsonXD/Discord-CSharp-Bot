@@ -14,7 +14,6 @@
       <PackageReference Include="Discord.Net" Version="3.8.1" />
       <PackageReference Include="FluentValidation" Version="11.5.0" />
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.0" />
-      <PackageReference Include="HttpClientFactory" Version="1.0.4" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.2">
         <PrivateAssets>all</PrivateAssets>
@@ -22,7 +21,6 @@
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="2.0.0-preview1-final" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.3" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
@@ -38,10 +36,6 @@
       <ProjectReference Include="..\SaplingClient\SaplingClient.csproj" />
       <ProjectReference Include="..\SpotifyClient\SpotifyClient.csproj" />
       <ProjectReference Include="..\YoutubeClient\YoutubeClient.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Core" />
     </ItemGroup>
 
 </Project>
