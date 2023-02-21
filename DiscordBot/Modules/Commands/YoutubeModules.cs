@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
 using Discord.Commands;
-using Discord.WebSocket;
+using DiscordBot.Core;
+using DiscordBot.Models;
 using DiscordBot.Modules.DiscordEmbeds;
 using DiscordBot.Modules.TimedEvents;
-using DiscordBot.Modules.TimedEvents.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using YoutubeClient.Exceptions;
 using YoutubeClient.Models;
 using YoutubeClient.Requests;
@@ -14,18 +15,14 @@ namespace DiscordBot.Modules.Commands;
 public class YoutubeModule : ModuleBase<SocketCommandContext>
 {
     private readonly YoutubeClientService _youtubeClientService;
-    private readonly YoutubeChannelListServiceRequest _ludwigServiceRequest;
-    private readonly TimedTaskHandler _timedTaskHandler;
-    private readonly DiscordSocketClient _discordSocketClient;
+    private readonly DiscordBotDatabase _database;
+    private readonly IMessageSink _messageSink;
 
-    public YoutubeModule(YoutubeClientService youtubeClientService, TimedTaskHandler timedTaskHandler, DiscordSocketClient discordSocketClient)
+    public YoutubeModule(YoutubeClientService youtubeClientService, DiscordBotDatabase database, IMessageSink messageSink)
     {
         _youtubeClientService = youtubeClientService;
-        _ludwigServiceRequest = _youtubeClientService.ChannelResource.List();
-        _ludwigServiceRequest.Id = "UCjK0F1DopxQ5U0sCwOlXwOg";
-        _ludwigServiceRequest.Parts.Add("contentDetails");
-        _timedTaskHandler = timedTaskHandler;
-        _discordSocketClient = discordSocketClient;
+        _database = database;
+        _messageSink = messageSink;
     }
 
     [Command("SearchYoutubeChannel")]
@@ -74,32 +71,35 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
         }
     }
 
-    [Command("Ludwig")]
-    [Summary("Sends channel information about Mogul Mail")]
-    public async Task LudwigAsync()
-    {
-        // Request Mogul Mail's channel content details with its channel id
-        var response = await _ludwigServiceRequest.ExecuteRequestAsync();
-
-        // Print out the channels uploads playlist id if its content details is not null
-        await Context.Channel.SendMessageAsync(response.Items.First().ContentDetails?.RelatedPlaylists.Uploads);
-    }
-    
-    [Command("Mogul")]
-    [Summary("Gets the latest mogul mail video")]
-    public async Task MogulMailAsync()
-    {
-        await GetNewestUploadAsync("UUjK0F1DopxQ5U0sCwOlXwOg");
-    }
-
     [Command("NotifyMe")]
     [RequireOwner]
     [Summary("Creates a new task to notify a user for youtube video uploads")]
     public async Task NotifyNewYoutubeVideoAsync(int interval, string channelPlaylistId)
     {
-        _timedTaskHandler.AddTask(new NewYoutubeVideoTimedTask(
-            TimeSpan.FromMinutes(interval), channelPlaylistId, Context.User.Id, _youtubeClientService, _discordSocketClient));
-            await Context.Channel.SendMessageAsync("Successfully added new notification alert!");
+        if (_database.YoutubeTimedTaskInformation.Any(item =>
+                item.DiscordUserId == Context.User.Id && item.ChannelId == channelPlaylistId))
+        {
+            await Context.Channel.SendMessageAsync($"{Context.User.Mention} Already subscribed for notifications to this playlist!");
+            return;
+        }
+        
+        var info = new YoutubeTimedTaskInformation()
+        {
+            ChannelId = channelPlaylistId,
+            DiscordUserId = Context.User.Id,
+            Interval = TimeSpan.FromMinutes(Math.Clamp(5, interval, 1440))
+        };
+
+        _database.YoutubeTimedTaskInformation.Add(info);
+        await _database.SaveChangesAsync();
+
+        await _messageSink.Consume(new TimedTaskMessage()
+        {
+            TimedTaskInformation = info,
+            Added = true
+        });
+
+        await Context.Channel.SendMessageAsync($"{Context.User.Mention} Successfully subscribed to channel playlist!");
     }
 
     [Command("UnNotifyMe")]
@@ -107,19 +107,20 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
     [Summary("Removes a youtube task from the tasks being executed, if found")]
     public async Task UnNotifyYoutubeVideoAsync(string channelPlaylistId)
     {
-        // Find a task that is a YoutubeVideoTimedTask and has the same discord user id and playlist id
-        if (_timedTaskHandler.FindTask(currentTask =>
-            {
-                var youtubeTask = currentTask as NewYoutubeVideoTimedTask;
-                if (youtubeTask == null) return false;
+        var dbItem = await _database.YoutubeTimedTaskInformation.FirstOrDefaultAsync(item =>
+            item.DiscordUserId == Context.User.Id && item.ChannelId == channelPlaylistId);
 
-                return youtubeTask.DiscordUserId == Context.User.Id &&
-                       youtubeTask.YoutubeChannelPlaylistId == channelPlaylistId;
-
-            }, out ITimedTask? task) && task != null)
+        if (dbItem != null)
         {
-            _timedTaskHandler.RemoveTask(task);
-            await Context.Message.Channel.SendMessageAsync("Successfully removed notification!");
+            _database.YoutubeTimedTaskInformation.Remove(dbItem);
+            await _database.SaveChangesAsync();
+            
+            await _messageSink.Consume(new TimedTaskMessage()
+            {
+                Added = false,
+                TimedTaskInformation = dbItem
+            });
+            await Context.Message.Channel.SendMessageAsync($"{Context.User.Mention} Successfully removed notification for this playlist!");
         }
     }
 
