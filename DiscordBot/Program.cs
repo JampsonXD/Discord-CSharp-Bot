@@ -10,10 +10,13 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using DiscordBot.Configuration;
 using DiscordBot.Configuration.Validation;
+using DiscordBot.Core;
 using DiscordBot.Modules.TimedEvents;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using SaplingClient.Services;
 using SpotifyClient.Authorization;
@@ -30,78 +33,57 @@ namespace DiscordBot
 
         private async Task MainAsync()
         {
-            ServiceProvider serviceProvider = GetServiceProvider();
-            DiscordSocketClient client = serviceProvider.GetRequiredService<DiscordSocketClient>();
-            client.Log += ApplicationLog;
-
-            // Get the discord token from our config file
-            var token = serviceProvider.GetRequiredService<IOptions<DiscordBotOptions>>().Value.Token;
-
-            // Log our command services
-            serviceProvider.GetRequiredService<CommandService>().Log += ApplicationLog;
-
-            // Initialize our command handler and interaction handler
-            await serviceProvider.GetRequiredService<CommandHandleService>().InitializeAsync();
-            await serviceProvider.GetRequiredService<InteractionHandleService>().InitializeAsync();
-            
-            // As soon as our client is ready, register all interaction commands
-            client.Ready += async () =>
-            {
-                await serviceProvider.GetRequiredService<InteractionService>().RegisterCommandsGloballyAsync();
-            };
-
-            // Login and start running our discord client
-            await client.LoginAsync(TokenType.Bot, token);
-            await client.StartAsync();
-
-            var taskHandler = serviceProvider.GetRequiredService<TimedTaskHandler>();
-
-            // Check for mogul mail
-            taskHandler.AddTask(new NewYoutubeVideoTimedTask(
-                TimeSpan.FromMinutes(10),"UUjK0F1DopxQ5U0sCwOlXwOg", 183663101848059906, serviceProvider.GetRequiredService<YoutubeClientService>(), client));
-            taskHandler.Start();
-            
-            await Task.Delay(-1);
+            var builder = new HostBuilder();
+            var host = builder.ConfigureAppConfiguration(ConfigureAppConfiguration)
+                .ConfigureServices(ConfigureAppServices)
+                .Build();
+            await host.RunAsync();
         }
 
-        private Task ApplicationLog(LogMessage arg)
+        private void ConfigureAppConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
         {
-            Console.WriteLine($"{arg.Exception} - {arg.Severity}: {arg.Message}");
-            return Task.CompletedTask;
+            configurationBuilder.SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", false);
         }
 
-        private static ServiceProvider GetServiceProvider()
+        private void ConfigureAppServices(HostBuilderContext context, IServiceCollection serviceCollection)
         {
-            IConfigurationRoot config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false).Build();
-
-            /* Add configuration options for each of our different services */
-            var serviceCollection = new ServiceCollection();
             serviceCollection.AddValidatorsFromAssemblyContaining<Program>();
-            
+
             serviceCollection.AddOptions<SpotifyAuthorizationOptions>()
-                .Bind(config.GetSection(SpotifyAuthorizationOptions.Position));
+                .Bind(context.Configuration.GetSection(SpotifyAuthorizationOptions.Position));
             serviceCollection.AddOptions<YoutubeClientOptions>()
-                .Bind(config.GetSection(YoutubeClientOptions.Position));
+                .Bind(context.Configuration.GetSection(YoutubeClientOptions.Position));
             serviceCollection.AddOptions<SaplingClientOptions>()
-                .Bind(config.GetSection(SaplingClientOptions.Position));
+                .Bind(context.Configuration.GetSection(SaplingClientOptions.Position));
             serviceCollection.AddOptions<DiscordBotOptions>()
-                .Bind(config.GetSection(DiscordBotOptions.Position))
+                .Bind(context.Configuration.GetSection(DiscordBotOptions.Position))
                 .ValidateFluently()
                 .ValidateOnStart();
 
+            /* Add Database Context */
+            serviceCollection.AddDbContext<DiscordBotDatabase>(options =>
+            {
+                options.UseSqlServer(context.Configuration.GetConnectionString("DefaultConnection"));
+            });
+            
             /* Add all of our services */
-            return serviceCollection
-                .AddSingleton<IConfiguration>(_ => config)
+            serviceCollection
+                .AddSingleton<IConfiguration>(_ => context.Configuration)
+                .AddSingleton<MessageProcessor>()
+                .AddHostedService<MessageProcessor>(provider => provider.GetRequiredService<MessageProcessor>())
+                .AddSingleton<IMessageSink>(provider => provider.GetRequiredService<MessageProcessor>())
+                .AddSingleton<ISubscriptionService>(provider => provider.GetRequiredService<MessageProcessor>())
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     MessageCacheSize = 1000,
                     GatewayIntents = GatewayIntents.All
                 }))
-                .AddSingleton<InteractionService>(provider => new InteractionService(provider.GetRequiredService<DiscordSocketClient>(), new InteractionServiceConfig()
-                {
-                    DefaultRunMode = Discord.Interactions.RunMode.Async
-                }))
+                .AddSingleton<InteractionService>(provider => new InteractionService(
+                    provider.GetRequiredService<DiscordSocketClient>(), new InteractionServiceConfig()
+                    {
+                        DefaultRunMode = Discord.Interactions.RunMode.Async
+                    }))
                 .AddSingleton<IContainer>(new Container())
                 .AddSingleton<InteractionHandleService>()
                 .AddSingleton(new CommandService(new CommandServiceConfig
@@ -130,8 +112,8 @@ namespace DiscordBot
                 }))
                 .AddSingleton<CommandHandleService>()
                 .AddScoped<Random>()
-                .AddSingleton<TimedTaskHandler>()
-                .BuildServiceProvider();
+                .AddHostedService<DiscordHostedService>()
+                .AddSingleton<TimedTaskHandler>();
         }
     }
 }
