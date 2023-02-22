@@ -7,7 +7,6 @@ using DiscordBot.Modules.TimedEvents;
 using Microsoft.EntityFrameworkCore;
 using YoutubeClient.Exceptions;
 using YoutubeClient.Models;
-using YoutubeClient.Requests;
 using YoutubeClient.Services;
 
 namespace DiscordBot.Modules.Commands;
