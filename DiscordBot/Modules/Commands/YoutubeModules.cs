@@ -92,7 +92,7 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
         _database.YoutubeTimedTaskInformation.Add(info);
         await _database.SaveChangesAsync();
 
-        await _messageSink.Consume(new TimedTaskMessage()
+        await _messageSink.Process(new TimedTaskMessage()
         {
             TimedTaskInformation = info,
             Added = true
@@ -114,7 +114,7 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
             _database.YoutubeTimedTaskInformation.Remove(dbItem);
             await _database.SaveChangesAsync();
             
-            await _messageSink.Consume(new TimedTaskMessage()
+            await _messageSink.Process(new TimedTaskMessage()
             {
                 Added = false,
                 TimedTaskInformation = dbItem
