@@ -32,7 +32,7 @@ namespace DiscordBot
         static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
 
         private async Task MainAsync()
-        {
+        { 
             var builder = new HostBuilder();
             var host = builder.ConfigureAppConfiguration(ConfigureAppConfiguration)
                 .ConfigureServices(ConfigureAppServices)
