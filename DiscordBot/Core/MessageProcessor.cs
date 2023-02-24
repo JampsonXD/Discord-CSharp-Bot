@@ -4,9 +4,7 @@ using Microsoft.Extensions.Hosting;
 namespace DiscordBot.Core;
 
 /// <summary>
-
 /// Represents a message with different types of data sent to a message sink
-
 /// </summary>
 
 public interface IMessage
@@ -15,9 +13,7 @@ public interface IMessage
 }
 
 /// <summary>
-
-/// Represents an object that collects messages
-
+/// Represents an object that collects messages.
 /// </summary>
 
 public interface IMessageSink
@@ -31,52 +27,44 @@ public interface IMessageSink
 }
 
 /// <summary>
-
-/// Represents a subscription service that can register and unregister events for different message types
-
+/// Represents a subscription service that can register and unregister events for different message types.
 /// </summary>
 
 public interface ISubscriptionService
 {
     /// <summary>
-    /// Subscribes a callback action to be called when a message of the same type is broadcast
+    /// Subscribes a callback action to be called when a message of the same type is broadcast.
     /// </summary>
-    /// <typeparam name="TMessage">The Type of message and callback action</typeparam>
-    /// <param name="action">The callback action</param>
-    /// <returns>A <see cref="ISubscriptionHandle"/> that holds a reference to the subscription entry that can be used to <see cref="Unsubscribe"/></returns>
+    /// <typeparam name="TMessage">The Type of message and callback action.</typeparam>
+    /// <param name="action">The callback action.</param>
+    /// <returns>A <see cref="ISubscriptionHandle"/> that holds a reference to the subscription entry that can be used to <see cref="Unsubscribe"/>.</returns>
     ISubscriptionHandle Subscribe<TMessage>(Action<TMessage> action) where TMessage: IMessage;
     /// <summary>
-    /// De-registers a subscribed action
+    /// De-registers a subscribed action.
     /// </summary>
-    /// <param name="handle">The handle holding a reference to the subscribed action</param>
+    /// <param name="handle">The handle holding a reference to the subscribed action.</param>
     void Unsubscribe(ISubscriptionHandle handle);
 }
 
 /// <summary>
-
-/// Represents a handle to a subscribed action for a <see cref="ISubscriptionService"/>
-
+/// Represents a handle to a subscribed action for a <see cref="ISubscriptionService"/>.
 /// </summary>
 
 public interface ISubscriptionHandle
 {
     /// <summary>
-    /// Describes whether this handle points to a valid subscription action
+    /// Describes whether this handle points to a valid subscription action.
     /// </summary>
-    /// <returns>Whether the handle is valid or invalid</returns>
+    /// <returns>Whether the handle is valid or invalid.</returns>
     public bool IsValid();
 }
 
 /// <summary>
-
-/// Represents a Message Processing Service that allows providers to provide <see cref="IMessage"/> and consumers to consume <see cref="IMessage"/>
-
+/// Represents a Message Processing Service that allows providers to provide <see cref="IMessage"/> and consumers to consume <see cref="IMessage"/>.
 /// </summary>
 
 /// <seealso cref="BackgroundService"/>
-
 /// <seealso cref="IMessageSink"/>
-
 /// <seealso cref="ISubscriptionService"/>
 
 public class MessageProcessor : BackgroundService, IMessageSink, ISubscriptionService
@@ -115,7 +103,7 @@ public class MessageProcessor : BackgroundService, IMessageSink, ISubscriptionSe
         /// <summary>
         /// The type of action the subscription entry was subscribed to.
         /// </summary>
-        public required Type Type { get; set; }
+        public required Type Type { get; init; }
         
         public bool IsValid()
         {
@@ -280,7 +268,7 @@ public class MessageProcessor : BackgroundService, IMessageSink, ISubscriptionSe
     }
 
     /// <summary>
-    /// Unsubscribes any actions related to the <see cref="SubscriptionHandle"/> that is passed is.
+    /// Unsubscribes any actions related to the <see cref="SubscriptionHandle"/> that is passed in.
     /// </summary>
     /// <param name="handle">The handle</param>
     public void Unsubscribe(ISubscriptionHandle handle)
