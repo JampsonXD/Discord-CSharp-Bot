@@ -4,6 +4,7 @@ using ClientService.ClientService;
 using Newtonsoft.Json;
 using YoutubeClient.Exceptions;
 using YoutubeClient.RequestResources;
+using SearchResource = YoutubeClient.RequestResources.SearchResource;
 
 namespace YoutubeClient.Services;
 

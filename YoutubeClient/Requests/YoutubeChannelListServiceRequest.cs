@@ -1,10 +1,12 @@
-﻿using ClientService.ServiceRequests;
+﻿using ClientService.ClientService;
+using ClientService.ServiceRequests;
 using YoutubeClient.Models;
 
 namespace YoutubeClient.Requests;
 
-public class YoutubeChannelListServiceRequest: YoutubeServiceRequest<YoutubeChannel>
+public sealed class YoutubeChannelListServiceRequest: YoutubeServiceRequest<YoutubeChannel>
 {
+    public override HttpMethod HttpMethod => HttpMethod.Get;
     public override string RelativePath => "channels";
     
     [RequestQueryParameter("part", true)]
@@ -16,7 +18,7 @@ public class YoutubeChannelListServiceRequest: YoutubeServiceRequest<YoutubeChan
     [RequestQueryParameter("forUsername")]
     public string? ForUsername { get; set; }
 
-    public YoutubeChannelListServiceRequest(ServiceRequestInitializer initializer) : base(initializer)
+    internal YoutubeChannelListServiceRequest(IClientService service) : base(service)
     {
         Parts = new List<string>();
     }

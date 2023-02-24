@@ -1,5 +1,4 @@
 ﻿using ClientService.ClientService;
-using ClientService.ServiceRequests;
 using SpotifyClient.Requests;
 
 namespace SpotifyClient.RequestResources;
@@ -15,11 +14,7 @@ public class TrackResource
 
     public SpotifyTrackServiceRequest TrackRequest(string? trackId = null)
     {
-        return new SpotifyTrackServiceRequest(new ServiceRequestInitializer()
-        {
-            ClientService = _clientService,
-            HttpMethod = HttpMethod.Get
-        })
+        return new SpotifyTrackServiceRequest(_clientService)
         {
             TrackId = trackId
         };

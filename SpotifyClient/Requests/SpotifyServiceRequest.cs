@@ -1,10 +1,11 @@
-﻿using ClientService.ServiceRequests;
+﻿using ClientService.ClientService;
+using ClientService.ServiceRequests;
 
 namespace SpotifyClient.Requests;
 
 public abstract class SpotifyServiceRequest<T>: BaseServiceRequest<T>
 {
-    protected SpotifyServiceRequest(ServiceRequestInitializer initializer) : base(initializer)
+    protected SpotifyServiceRequest(IClientService service) : base(service)
     {
         
     }

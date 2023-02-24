@@ -1,5 +1,4 @@
-﻿using ClientService.ServiceRequests;
-using SaplingClient.Requests;
+﻿using SaplingClient.Requests;
 using SaplingClient.Services;
 
 namespace SaplingClient.Resources;
@@ -15,10 +14,6 @@ public class GrammarCorrectionResource
 
     public GrammarCheckingServiceRequest GrammarCheckingService()
     {
-        return new GrammarCheckingServiceRequest(new ServiceRequestInitializer()
-        {
-            HttpMethod = HttpMethod.Post,
-            ClientService = _service
-        });
+        return new GrammarCheckingServiceRequest(_service);
     }
 }

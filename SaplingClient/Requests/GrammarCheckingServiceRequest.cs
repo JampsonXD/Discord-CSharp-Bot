@@ -1,4 +1,5 @@
-﻿using ClientService.ServiceRequests;
+﻿using ClientService.ClientService;
+using ClientService.ServiceRequests;
 using Newtonsoft.Json.Linq;
 using SaplingClient.Models;
 
@@ -6,13 +7,15 @@ namespace SaplingClient.Requests;
 
 public class GrammarCheckingServiceRequest: BaseServiceRequest<SaplingGrammarResponse>
 {
+    public override HttpMethod HttpMethod => HttpMethod.Post;
+    
     public string? Message { get; set; }
 
-    public GrammarCheckingServiceRequest(ServiceRequestInitializer initializer) : base(initializer)
+    public GrammarCheckingServiceRequest(IClientService service) : base(service)
     {
         
     }
-
+    
     public override string RelativePath => "edits";
 
     protected override object? GetBody()

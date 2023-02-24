@@ -1,11 +1,13 @@
-﻿using ClientService.ServiceRequests;
+﻿using ClientService.ClientService;
+using ClientService.ServiceRequests;
 using YoutubeClient.Models;
 
 namespace YoutubeClient.Requests;
 
-public class YoutubePlaylistItemListServiceRequest: YoutubeServiceRequest<YoutubePlaylistItem>
+public sealed class YoutubePlaylistItemListServiceRequest: YoutubeServiceRequest<YoutubePlaylistItem>
 {
     private int? _maxResults;
+    public override HttpMethod HttpMethod => HttpMethod.Get;
     public override string RelativePath => "playlistItems";
 
     [RequestQueryParameter("playlistId", true)]
@@ -24,7 +26,7 @@ public class YoutubePlaylistItemListServiceRequest: YoutubeServiceRequest<Youtub
     [RequestQueryParameter("pageToken")]
     public string? PageToken { get; set; }
 
-    public YoutubePlaylistItemListServiceRequest(ServiceRequestInitializer initializer) : base(initializer)
+    internal YoutubePlaylistItemListServiceRequest(IClientService service) : base(service)
     {
         Parts = new List<string>();
     }

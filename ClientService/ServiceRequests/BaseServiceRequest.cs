@@ -14,7 +14,7 @@ namespace ClientService.ServiceRequests;
     default implementation for executing a service request, and initialization of child class Uri parameters. */
 public abstract class BaseServiceRequest<T> : IServiceRequest<T>
 {
-    public HttpMethod HttpMethod { get; protected set; }
+    public abstract HttpMethod HttpMethod { get;}
 
     public IList<string> UriParameters => GetUriParameters();
 
@@ -23,26 +23,34 @@ public abstract class BaseServiceRequest<T> : IServiceRequest<T>
 
     private readonly List<PropertyInfo> _requestParameterProperties;
 
-    protected BaseServiceRequest(ServiceRequestInitializer initializer)
+    protected BaseServiceRequest(IClientService service)
     {
-        HttpMethod = initializer.HttpMethod;
-        ClientService = initializer.ClientService ?? throw new InvalidOperationException();
+        ClientService = service;
         _requestParameterProperties = new List<PropertyInfo>();
         InitializeRequestParameterProperties();
     }
     
     public T ExecuteRequest()
     {
-        HttpRequestMessage message = CreateRequestMessage();
+        using var message = CreateRequestMessage();
         var response = ClientService.HttpClient.Send(message);
+        if (response.IsSuccessStatusCode)
+        {
+            return ClientService.HandleHttpResponseMessage<T>(response);
+        }
         return ClientService.HandleHttpResponseMessage<T>(response);
     }
 
     public async Task<T> ExecuteRequestAsync()
     {
-        HttpRequestMessage message = CreateRequestMessage();
+        using var message = CreateRequestMessage();
         var response = await ClientService.HttpClient.SendAsync(message);
         return ClientService.HandleHttpResponseMessage<T>(response);
+    }
+
+    protected virtual void HandleErrorResponse()
+    {
+        
     }
 
     protected virtual object? GetBody()

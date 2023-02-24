@@ -1,11 +1,13 @@
-﻿using ClientService.ServiceRequests;
+﻿using ClientService.ClientService;
+using ClientService.ServiceRequests;
 using YoutubeClient.Models;
 
 namespace YoutubeClient.Requests;
 
-public class YoutubeSearchServiceRequest: YoutubeServiceRequest<YoutubeSearch>
+public sealed class YoutubeSearchServiceRequest: YoutubeServiceRequest<YoutubeSearch>
 {
     private int? _maxResults;
+    public override HttpMethod HttpMethod => HttpMethod.Get;
     public override string RelativePath => "search";
     
     /* Specifies search resource properties to include in the result. Search results only allow for snippet resources to be included */
@@ -36,7 +38,7 @@ public class YoutubeSearchServiceRequest: YoutubeServiceRequest<YoutubeSearch>
     [RequestQueryParameter("type")]
     public string? Type { get; private set; }
     
-    public YoutubeSearchServiceRequest(ServiceRequestInitializer initializer) : base(initializer)
+    internal YoutubeSearchServiceRequest(IClientService service) : base(service)
     {
         
     }
