@@ -39,10 +39,18 @@ public class TimedTaskHandler
         // Continue our loop until we are asked to stop the tasks
         while (!token.IsCancellationRequested)
         {
-            lock (_lock)
+            // Any exceptions thrown from tasks should not stop our handler from running, log the exceptions
+            try
             {
-                var tasks = _timedTasks.Select(HandleTask);
-                Task.WaitAll(tasks.ToArray(), token);
+                lock (_lock)
+                {
+                    var tasks = _timedTasks.Select(HandleTask);
+                    Task.WaitAll(tasks.ToArray(), token);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 
