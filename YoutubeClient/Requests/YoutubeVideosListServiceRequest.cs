@@ -1,4 +1,5 @@
 ﻿using ClientService.ClientService;
+using ClientService.Core.Validation;
 using ClientService.ServiceRequests;
 using YoutubeClient.Models;
 
@@ -10,10 +11,12 @@ public sealed class YoutubeVideosListServiceRequest: YoutubeServiceRequest<Youtu
     public override HttpMethod HttpMethod => HttpMethod.Get;
     public override string RelativePath => "videos";
 
-    [RequestQueryParameter("id", true)]
+    [RequestQueryParameter("id")]
+    [ValidatePropertyNotNull]
     public List<string> Ids { get; set; }
     
-    [RequestQueryParameter("part", true)]
+    [RequestQueryParameter("part")]
+    [ValidatePropertyNotNull]
     public List<string> Parts { get; set; }
 
     [RequestQueryParameter("maxResults")]

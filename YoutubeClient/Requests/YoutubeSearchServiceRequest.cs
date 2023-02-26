@@ -1,4 +1,5 @@
 ﻿using ClientService.ClientService;
+using ClientService.Core.Validation;
 using ClientService.ServiceRequests;
 using YoutubeClient.Models;
 
@@ -11,7 +12,8 @@ public sealed class YoutubeSearchServiceRequest: YoutubeServiceRequest<YoutubeSe
     public override string RelativePath => "search";
     
     /* Specifies search resource properties to include in the result. Search results only allow for snippet resources to be included */
-    [RequestQueryParameter("part", true)] 
+    [RequestQueryParameter("part")] 
+    [ValidatePropertyNotNull]
     public string Part => "snippet";
 
     /* Specifies that a search should only contain results from a specified channel */
@@ -31,7 +33,8 @@ public sealed class YoutubeSearchServiceRequest: YoutubeServiceRequest<YoutubeSe
     public string? Order { get; private set; }
 
     /* Query string to be sent with the request */
-    [RequestQueryParameter("q", true)]
+    [RequestQueryParameter("q")]
+    [ValidatePropertyNotNull]
     public string Query { get; set; } = string.Empty;
     
     /* Specifies the type of resource we want to search for (videos, channels, playlists) */
