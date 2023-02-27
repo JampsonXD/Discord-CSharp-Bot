@@ -12,16 +12,16 @@ public sealed class YoutubeSearchServiceRequest: YoutubeServiceRequest<YoutubeSe
     public override string RelativePath => "search";
     
     /* Specifies search resource properties to include in the result. Search results only allow for snippet resources to be included */
-    [RequestQueryParameter("part")] 
+    [QueryParameter("part")] 
     [ValidatePropertyNotNull]
     public string Part => "snippet";
 
     /* Specifies that a search should only contain results from a specified channel */
-    [RequestQueryParameter("channelId")]
+    [QueryParameter("channelId")]
     public string? ChannelId { get; set; }
     
     /* Specifies the maximum amount of search results to be returned */
-    [RequestQueryParameter("maxResults")]
+    [QueryParameter("maxResults")]
     public int? MaxResults
     {
         get => _maxResults;
@@ -29,16 +29,16 @@ public sealed class YoutubeSearchServiceRequest: YoutubeServiceRequest<YoutubeSe
     }
     
     /* Specifies the order in which search results should be returned */
-    [RequestQueryParameter("order")]
+    [QueryParameter("order")]
     public string? Order { get; private set; }
 
     /* Query string to be sent with the request */
-    [RequestQueryParameter("q")]
+    [QueryParameter("q")]
     [ValidatePropertyNotNull]
     public string Query { get; set; } = string.Empty;
     
     /* Specifies the type of resource we want to search for (videos, channels, playlists) */
-    [RequestQueryParameter("type")]
+    [QueryParameter("type")]
     public string? Type { get; private set; }
     
     internal YoutubeSearchServiceRequest(IClientService service) : base(service)

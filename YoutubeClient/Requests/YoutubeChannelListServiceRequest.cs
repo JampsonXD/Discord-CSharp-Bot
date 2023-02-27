@@ -11,15 +11,15 @@ public sealed class YoutubeChannelListServiceRequest: YoutubeServiceRequest<Yout
     public override HttpMethod HttpMethod => HttpMethod.Get;
     public override string RelativePath => "channels";
     
-    [RequestQueryParameter("part")]
+    [QueryParameter("part")]
     [ValidatePropertyNotNull]
     public List<string> Parts { get; set; }
     
-    [RequestQueryParameter("id")]
+    [QueryParameter("id")]
     [ValidatePropertyNotNull]
     public string? Id { get; set; }
     
-    [RequestQueryParameter("forUsername")]
+    [QueryParameter("forUsername")]
     public string? ForUsername { get; set; }
 
     internal YoutubeChannelListServiceRequest(IClientService service) : base(service)

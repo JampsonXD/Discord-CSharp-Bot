@@ -35,20 +35,20 @@ namespace DiscordBot
             
             _client.MessageReceived += ClientOnMessageReceived;
             _client.Ready += ClientOnReady;
-            subscriptionService.Subscribe<TimedTaskMessage>(OnTimeTaskMessageReceived);
+            subscriptionService.Subscribe<YoutubeTimedTaskDatabaseUpdateMessage>(OnTimeTaskMessageReceived);
         }
 
-        private void OnTimeTaskMessageReceived(TimedTaskMessage message)
+        private void OnTimeTaskMessageReceived(YoutubeTimedTaskDatabaseUpdateMessage databaseUpdateMessage)
         {
-            Task.Run(() => NotifyOfTimeTaskMessageReceived(message));
+            Task.Run(() => NotifyOfTimeTaskMessageReceived(databaseUpdateMessage));
         }
 
-        private async Task NotifyOfTimeTaskMessageReceived(TimedTaskMessage message)
+        private async Task NotifyOfTimeTaskMessageReceived(YoutubeTimedTaskDatabaseUpdateMessage databaseUpdateMessage)
         {
-            var user = _client.GetUser(message.TimedTaskInformation.DiscordUserId);
-            var action = message.Added ? "Added" : "Removed";
+            var user = _client.GetUser(databaseUpdateMessage.TimedTaskInformation.DiscordUserId);
+            var action = databaseUpdateMessage.Added ? "Added" : "Removed";
             await _client.GetUser(183663101848059906).SendMessageAsync(
-                $"Time task has been {action} for discord user {user.Username} following channel id {message.TimedTaskInformation.ChannelId}");
+                $"Time task has been {action} for discord user {user.Username} following channel id {databaseUpdateMessage.TimedTaskInformation.ChannelId}");
         }
         
 

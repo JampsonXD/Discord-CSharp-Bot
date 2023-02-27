@@ -11,22 +11,22 @@ public sealed class YoutubePlaylistItemListServiceRequest: YoutubeServiceRequest
     public override HttpMethod HttpMethod => HttpMethod.Get;
     public override string RelativePath => "playlistItems";
 
-    [RequestQueryParameter("playlistId")]
+    [QueryParameter("playlistId")]
     [ValidatePropertyNotNull]
     public string? PlaylistId { get; set; }
     
-    [RequestQueryParameter("part")]
+    [QueryParameter("part")]
     [ValidatePropertyNotNull]
     public List<string> Parts { get; set; }
 
-    [RequestQueryParameter("maxResults")]
+    [QueryParameter("maxResults")]
     public int? MaxResults
     {
         get => _maxResults;
         set => _maxResults = Math.Clamp(value ?? 1, 1, 50);
     }
     
-    [RequestQueryParameter("pageToken")]
+    [QueryParameter("pageToken")]
     public string? PageToken { get; set; }
 
     internal YoutubePlaylistItemListServiceRequest(IClientService service) : base(service)

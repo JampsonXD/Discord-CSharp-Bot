@@ -92,10 +92,10 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
         _database.YoutubeTimedTaskInformation.Add(info);
         await _database.SaveChangesAsync();
 
-        await _messageSink.Process(new TimedTaskMessage()
+        await _messageSink.Process(new YoutubeTimedTaskDatabaseUpdateMessage()
         {
             TimedTaskInformation = info,
-            Added = true
+            Added = true,
         });
 
         await Context.Channel.SendMessageAsync($"{Context.User.Mention} Successfully subscribed to channel playlist!");
@@ -114,10 +114,10 @@ public class YoutubeModule : ModuleBase<SocketCommandContext>
             _database.YoutubeTimedTaskInformation.Remove(dbItem);
             await _database.SaveChangesAsync();
             
-            await _messageSink.Process(new TimedTaskMessage()
+            await _messageSink.Process(new YoutubeTimedTaskDatabaseUpdateMessage()
             {
                 Added = false,
-                TimedTaskInformation = dbItem
+                TimedTaskInformation = dbItem,
             });
             await Context.Message.Channel.SendMessageAsync($"{Context.User.Mention} Successfully removed notification for this playlist!");
         }

@@ -11,22 +11,22 @@ public sealed class YoutubeVideosListServiceRequest: YoutubeServiceRequest<Youtu
     public override HttpMethod HttpMethod => HttpMethod.Get;
     public override string RelativePath => "videos";
 
-    [RequestQueryParameter("id")]
+    [QueryParameter("id")]
     [ValidatePropertyNotNull]
     public List<string> Ids { get; set; }
     
-    [RequestQueryParameter("part")]
+    [QueryParameter("part")]
     [ValidatePropertyNotNull]
     public List<string> Parts { get; set; }
 
-    [RequestQueryParameter("maxResults")]
+    [QueryParameter("maxResults")]
     public int? MaxResults
     {
         get => _maxResults;
         set => _maxResults = Math.Clamp(value ?? 1, 1, 50);
     }
     
-    [RequestQueryParameter("pageToken")]
+    [QueryParameter("pageToken")]
     public string? PageToken { get; set; }
     
     internal YoutubeVideosListServiceRequest(IClientService service) : base(service)

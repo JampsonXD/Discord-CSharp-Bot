@@ -45,7 +45,7 @@ public abstract class BaseServiceRequest<TResponse> : IServiceRequest<TResponse>
     private readonly List<PropertyInfo> _requestParameterProperties;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="BaseServiceRequest"/> class.
+    /// Initializes a new instance of the "<see cref="BaseServiceRequest{TResponse}"/>" class.
     /// </summary>
     /// <param name="service">The client service this request relates to.</param>
     protected BaseServiceRequest(IClientService service)
@@ -160,22 +160,22 @@ public abstract class BaseServiceRequest<TResponse> : IServiceRequest<TResponse>
     }
 
     /// <summary>
-    /// Initializes the query parameter properties. Caches all <see cref="RequestQueryParameterAttribute"/> attributes for use during request execution.
+    /// Initializes the query parameter properties. Caches all <see cref="QueryParameterAttribute"/> attributes for use during request execution.
     /// </summary>
     void InitializeRequestParameterProperties()
     {
         _requestParameterProperties.Clear();
         _requestParameterProperties.InsertRange(0, 
-            this.GetType().GetProperties().Where(prop => prop.GetCustomAttribute<RequestQueryParameterAttribute>() != null));
+            this.GetType().GetProperties().Where(prop => prop.GetCustomAttribute<QueryParameterAttribute>() != null));
     }
 
     /// <summary>
-    /// Creates a query string to be added to <see cref="UriParameters"/> from a <see cref="RequestQueryParameterAttribute"/> and its associated value.
+    /// Creates a query string to be added to <see cref="UriParameters"/> from a <see cref="QueryParameterAttribute"/> and its associated value.
     /// </summary>
     /// <param name="attribute">The attribute instance.</param>
     /// <param name="propertyValue">The properties value.</param>
     /// <returns>A query string.</returns>
-    string GetQueryStringFromParameterAttribute(RequestQueryParameterAttribute attribute, object? propertyValue)
+    string GetQueryStringFromParameterAttribute(QueryParameterAttribute attribute, object? propertyValue)
     {
         if (propertyValue != null)
         {
@@ -213,7 +213,7 @@ public abstract class BaseServiceRequest<TResponse> : IServiceRequest<TResponse>
         foreach (var prop in _requestParameterProperties)
         {
             // These requests have already been null checked and verified to have a Request Parameter Attribute when first initialized
-            var attribute = prop.GetCustomAttribute<RequestQueryParameterAttribute>();
+            var attribute = prop.GetCustomAttribute<QueryParameterAttribute>();
             Debug.Assert(attribute != null);
             
             // Get any attribute validators the property might have been tagged with and use these for validation

@@ -10,7 +10,7 @@ namespace ClientService.ServiceRequests;
 /// <seealso cref="Attribute"/>
 
 [AttributeUsage(AttributeTargets.Property)]
-public class RequestQueryParameterAttribute: Attribute
+public class QueryParameterAttribute: Attribute
 {
     /// <summary>
     /// The query parameter name.
@@ -21,10 +21,10 @@ public class RequestQueryParameterAttribute: Attribute
     public string ParameterName { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RequestQueryParameterAttribute"/> class.
+    /// Initializes a new instance of the <see cref="QueryParameterAttribute"/> class.
     /// </summary>
     /// <param name="parameterName">The parameters name.</param>
-    public RequestQueryParameterAttribute(string parameterName)
+    public QueryParameterAttribute(string parameterName)
     {
         ParameterName = parameterName;
     }
