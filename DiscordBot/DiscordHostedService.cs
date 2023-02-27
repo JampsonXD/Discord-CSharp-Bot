@@ -19,13 +19,12 @@ public class DiscordHostedService: IHostedService
     private readonly InteractionService _interactionService;
     private readonly CommandHandleService _commandHandleService;
     private readonly InteractionHandleService _interactionHandleService;
-    private readonly DiscordBotDatabase _database;
-    private readonly TimedTaskHandler _handler;
     private readonly ISubscriptionService _subscriptionService;
-    private readonly YoutubeClientService _youtubeClient;
+    private readonly YoutubeClientService _youtubeClientService;
+    private readonly TimedTaskHandler _timedTaskHandler;
 
     public DiscordHostedService(DiscordSocketClient discordClient, IOptions<DiscordBotOptions> options,
-        CommandService commandService, InteractionService interactionService, CommandHandleService commandHandleService, InteractionHandleService interactionHandleService, TimedTaskHandler handler, DiscordBotDatabase database, ISubscriptionService subscriptionService, YoutubeClientService youtubeClient)
+        CommandService commandService, InteractionService interactionService, CommandHandleService commandHandleService, InteractionHandleService interactionHandleService, ISubscriptionService subscriptionService, YoutubeClientService youtubeClientService, TimedTaskHandler timedTaskHandler)
     {
         _discordClient = discordClient;
         _options = options.Value;
@@ -33,10 +32,9 @@ public class DiscordHostedService: IHostedService
         _interactionService = interactionService;
         _commandHandleService = commandHandleService;
         _interactionHandleService = interactionHandleService;
-        _handler = handler;
-        _database = database;
         _subscriptionService = subscriptionService;
-        _youtubeClient = youtubeClient;
+        _youtubeClientService = youtubeClientService;
+        _timedTaskHandler = timedTaskHandler;
     }
 
     private async Task Setup()
@@ -56,28 +54,33 @@ public class DiscordHostedService: IHostedService
             await _interactionService.RegisterCommandsGloballyAsync();
         };
 
+        _subscriptionService.Subscribe<YoutubeTimedTaskDatabaseUpdateMessage>(
+            OnYoutubeTimedTaskDatabaseUpdateMessageReceived);
+
         // Login and start running our discord client
         await _discordClient.LoginAsync(TokenType.Bot, _options.Token);
         await _discordClient.StartAsync();
+    }
 
-        // Create new Timed Tasks from our Timed Task Information stored in our database
-        _handler.AddTasks(_database.YoutubeTimedTaskInformation.Select(info => 
-            new NewYoutubeVideoTimedTask(info.Interval, info.ChannelId, info.DiscordUserId, _youtubeClient, _discordClient)));
-
-        // Notify our Timed Task Handler handling objects when a youtube timed task has been added or removed from the database
-        _subscriptionService.Subscribe<TimedTaskMessage>(OnTimedTaskMessageReceived);
-        _handler.Start();
+    private void OnYoutubeTimedTaskDatabaseUpdateMessageReceived(YoutubeTimedTaskDatabaseUpdateMessage message)
+    {
+        if (message.Added)
+        {
+            _timedTaskHandler.AddTask(message.ToTimedTask(_youtubeClientService, _discordClient));
+        }
+        else
+        {
+            if (_timedTaskHandler.FindTask(message.MatchesTimedTask, out var foundTask) && foundTask != null)
+            {
+                _timedTaskHandler.RemoveTask(foundTask);
+            }
+        }
     }
 
     private Task ApplicationLog(LogMessage arg)
     {
         Console.WriteLine($"{arg.Exception} - {arg.Severity}: {arg.Message}");
         return Task.CompletedTask;
-    }
-
-    private void OnTimedTaskMessageReceived(TimedTaskMessage message)
-    {
-        _handler.NotifyTimedTaskHandler(message, _youtubeClient, _discordClient);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)

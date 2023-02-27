@@ -12,6 +12,7 @@ using DiscordBot.Configuration;
 using DiscordBot.Configuration.Validation;
 using DiscordBot.Core;
 using DiscordBot.Modules.TimedEvents;
+using DiscordBot.Modules.TimedEvents.Interfaces;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -113,7 +114,17 @@ namespace DiscordBot
                 .AddSingleton<CommandHandleService>()
                 .AddScoped<Random>()
                 .AddHostedService<DiscordHostedService>()
-                .AddSingleton<TimedTaskHandler>();
+                .AddScoped<YoutubeTimedTaskDatabaseRetriever>()
+                .AddSingleton<TimedTaskHandler>(provider =>
+                {
+                    List<ITimedTask> list;
+                    using (var scope = provider.CreateScope())
+                    {
+                        list = scope.ServiceProvider.GetRequiredService<YoutubeTimedTaskDatabaseRetriever>().GetTimedTasks().ToList();
+                    }
+                    return new TimedTaskHandler(list, provider);
+                })
+                .AddHostedService<TimedTaskHandler>(provider => provider.GetRequiredService<TimedTaskHandler>());
         }
     }
 }

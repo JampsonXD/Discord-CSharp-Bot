@@ -1,60 +1,26 @@
-﻿using DiscordBot.Modules.TimedEvents.Interfaces;
+﻿using System.Collections.Concurrent;
+using DiscordBot.Modules.TimedEvents.Interfaces;
+using Microsoft.Extensions.Hosting;
 
 namespace DiscordBot.Modules.TimedEvents;
 
-public class TimedTaskHandler
+public class TimedTaskHandler: BackgroundService
 {
     private readonly List<ITimedTask> _timedTasks;
-    private CancellationTokenSource _cancellationTokenSource;
-    private bool _taskActive;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ConcurrentBag<ITimedTask> _newTasks;
     private readonly object _lock = new();
 
-    public TimedTaskHandler(IServiceProvider serviceProvider)
+    public TimedTaskHandler(List<ITimedTask> tasks, IServiceProvider serviceProvider)
     {
-        _timedTasks = new List<ITimedTask>();
-        _taskActive = false;
+        _timedTasks = tasks;
         _serviceProvider = serviceProvider;
-        _cancellationTokenSource = new CancellationTokenSource();
+        _newTasks = new ConcurrentBag<ITimedTask>();
     }
 
-    public void Start()
+    public TimedTaskHandler(IServiceProvider serviceProvider) : this(new List<ITimedTask>(), serviceProvider)
     {
-        if (!_taskActive)
-        {
-            _taskActive = true;
-            _cancellationTokenSource = new CancellationTokenSource();
-            Task.Run(() => Run(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
-        }
-    }
-
-    private Task Run(CancellationToken token)
-    {
-        // Initialize the tasks
-        lock (_lock)
-        {
-            Task.WaitAll(_timedTasks.Select(task => task.InitializeTask(_serviceProvider)).ToArray());
-        }
-
-        // Continue our loop until we are asked to stop the tasks
-        while (!token.IsCancellationRequested)
-        {
-            // Any exceptions thrown from tasks should not stop our handler from running, log the exceptions
-            try
-            {
-                lock (_lock)
-                {
-                    var tasks = _timedTasks.Select(HandleTask);
-                    Task.WaitAll(tasks.ToArray(), token);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
-
-        return Task.CompletedTask;
+        
     }
 
     private async Task HandleTask(ITimedTask task)
@@ -65,35 +31,17 @@ public class TimedTaskHandler
             await task.ResetTask();
         }
     }
-    
-    public void Stop()
-    {
-        if (_taskActive)
-        {
-            _taskActive = true;
-            _cancellationTokenSource.Cancel();
-        }
-    }
 
     public void AddTask(ITimedTask newTask)
     {
-        lock (_lock)
-        {
-            _timedTasks.Add(newTask);
-            newTask.InitializeTask(_serviceProvider);
-        }
+        _newTasks.Add(newTask);
     }
 
     public void AddTasks(IEnumerable<ITimedTask> tasks)
     {
-        lock (_lock)
+        foreach (var task in tasks)
         {
-            var newTasks = tasks.ToArray();
-            _timedTasks.AddRange(newTasks);
-            foreach (var task in newTasks)
-            {
-                task.InitializeTask(_serviceProvider);
-            }
+            _newTasks.Add(task);
         }
     }
 
@@ -121,5 +69,45 @@ public class TimedTaskHandler
         {
             _timedTasks.Remove(task);
         }
+    }
+
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        // Initialize the tasks
+        lock (_lock)
+        {
+            Task.WaitAll(_timedTasks.Select(task => task.InitializeTask(_serviceProvider)).ToArray());
+        }
+
+        // Continue our loop until we are asked to stop the tasks
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            // Any exceptions thrown from tasks should not stop our handler from running, log the exceptions
+            try
+            {
+                lock (_lock)
+                {
+                    while(!_newTasks.IsEmpty)
+                    {
+                        if (_newTasks.TryTake(out var newTask))
+                        {
+                            newTask.InitializeTask(_serviceProvider);
+                            _timedTasks.Add(newTask);
+                        }
+
+                        break;
+                    }
+                    
+                    var tasks = _timedTasks.Select(HandleTask);
+                    Task.WaitAll(tasks.ToArray(), stoppingToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
+        return Task.CompletedTask;
     }
 }
