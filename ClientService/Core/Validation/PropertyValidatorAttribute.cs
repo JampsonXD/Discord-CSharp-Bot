@@ -4,7 +4,7 @@ namespace ClientService.Core.Validation;
 /// Represents a reflection attribute validator for the property value belonging to this attribute.
 /// </summary>
 
-[AttributeUsage(AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public abstract class PropertyValidatorAttribute: Attribute
 {
     /// <summary>
